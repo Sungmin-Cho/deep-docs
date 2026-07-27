@@ -3,12 +3,8 @@ name: doc-scanner
 model: sonnet
 color: blue
 description: |
-  프로젝트의 에이전트 지침 문서(CLAUDE.md, AGENTS.md 등)를 스캔하여
-  코드와의 괴리를 탐지하고 guarded last-scan artifact를 emit하는 에이전트.
-  <example>
-  Context: /deep-docs scan 또는 reuse 실패 후 자동 re-scan
-  prompt: "Immutable ScanContextV1과 quoted Node runtime command를 사용해 auto-fix / authoring / audit-only를 분류하고 scan payload를 emit하세요."
-  </example>
+  프로젝트 지침 문서(CLAUDE.md, AGENTS.md 등)를 스캔해 코드와의 괴리를
+  auto-fix / authoring / audit-only로 분류하고 guarded last-scan artifact를 emit한다.
 whenToUse: |
   deep-docs host-routing table에서만 spawn된다. 직접 호출하지 않는다.
 tools:
@@ -44,7 +40,7 @@ tools:
 
 ### 1. Document inventory
 
-Context에 포함된 문서만 분류한다. 대상 정책은 root/subtree `CLAUDE.md`, `AGENTS.md`, root `README.md`, root `CONTRIBUTING.md`/`ARCHITECTURE.md`, 그리고 `docs/` Markdown이다. Runtime이 제외한 symlink, ignored untracked candidate, state tree, vendor/build tree를 다시 포함하지 않는다.
+Context에 포함된 문서만 분류한다. 후보 범위와 ignore projection은 `references/scan-rules.md`의 executable candidate scope가 정의하며, runtime이 제외한 symlink, ignored untracked candidate, state tree, vendor/build tree를 다시 포함하지 않는다.
 
 문서가 0개여도 종료하지 않고 Step 9의 missing-doc guards를 평가한다.
 
@@ -103,19 +99,15 @@ Runtime CommonMark segments 안에서만 exact 3-line windows를 비교한다. S
 
 ### 9. Missing/thin document gaps
 
-Root-only `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`만 후보이며 runtime document/ignore facts를 따른다. 문서 관리 기본 정책은 **AGENTS.md 우선 단일 소스(authoring-rules D13)**: 공용 지침은 AGENTS.md, CLAUDE.md는 `@AGENTS.md` import + Claude Code 특화 내용만 담는 thin wrapper다.
+Root-only `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`만 후보다. 각 gap의 전제 조건, severity, 그리고 AGENTS.md 우선 단일 소스 정책(authoring-rules D13 — 공용 지침은 AGENTS.md, CLAUDE.md는 `@AGENTS.md` import + Claude Code 특화 내용만 담는 thin wrapper)은 `references/scan-rules.md`의 authoring rule이 정의한다. Ignored target은 제외하고, monorepo package-local document는 v2까지 생성하지 않는다.
 
-- missing AGENTS: build manifest와 source directory가 모두 있거나 **root CLAUDE.md가 존재할 때**, severity medium. root CLAUDE.md가 있으면 rationale에 공용 콘텐츠 이관 대상임을 명시한다.
-- missing CLAUDE: build manifest와 source directory가 모두 있을 때만, severity medium. AGENTS.md가 존재하거나 같은 scan에서 missing-doc(AGENTS.md) gap이 나오면 create 골격은 thin wrapper, 아니면 단독 full 골격이다.
-- missing ARCHITECTURE: 약 10k LOC 이상일 때만, severity high.
-- thin document: required-section deficit 또는 `uncovered_modules[] / total_modules`가 authoring rule threshold를 넘는 명백한 경우만, severity low~medium.
-- thin CLAUDE (D13 wrapper deficit): root CLAUDE.md에 `@AGENTS.md` import가 없고 런타임 공용 지침을 담고 있으며, AGENTS.md가 존재하거나 같은 scan에서 missing-doc(AGENTS.md) gap이 나오는 경우 — `thin-doc`(mode `restructure`), severity low~medium. evidence에 import 부재를 명시한다.
-- ignored target은 제외한다. Monorepo package-local documents는 v2까지 생성하지 않는다.
-- `missing-doc`은 `exists: false`, `mode: "create"`; `thin-doc`은 `exists: true`, `mode: "restructure"`. `doc_kind`와 target path는 root-only allowlist와 일치해야 한다.
+emit이 fail-closed로 검증하는 매핑은 반드시 지킨다.
 
-Scan은 `payload.gaps[]` 명세만 만들며 draft 본문을 만들지 않는다.
+- `missing-doc` ⇔ `exists: false` ⇔ `mode: "create"`
+- `thin-doc` ⇔ `exists: true` ⇔ `mode: "restructure"`
+- `doc_kind`와 `target_path`는 root-only allowlist와 정확히 일치해야 한다.
 
-Each gap retains the validated shape: `type`, `category: "authoring"`, `severity`, root-only `target_path`, `exists`, human-verifiable `evidence`, and `authoring_spec: { doc_kind, mode, rationale }`. It never places replacement-style `current_value`/`suggested_value` fields on an authoring gap.
+Scan은 `payload.gaps[]` 명세만 만들며 draft 본문을 만들지 않는다. Each gap retains the validated shape: `type`, `category: "authoring"`, `severity`, root-only `target_path`, `exists`, human-verifiable `evidence`, and `authoring_spec: { doc_kind, mode, rationale }`. It never places replacement-style `current_value`/`suggested_value` fields on an authoring gap.
 
 ## Payload and emit
 
@@ -124,7 +116,7 @@ Each gap retains the validated shape: `type`, `category: "authoring"`, `severity
 3. Call `emit --root "<target-root>" --request scan-payload-request.json` through the quoted runtime command.
 4. Return the emitted artifact and exact `artifact_revision`. A runtime failure is report-and-halt; do not hand-build or directly replace the artifact.
 
-The emitted envelope has this documentary shape. The runtime supplies all omitted ownership fields:
+The emitted envelope has this documentary shape. The runtime supplies all omitted ownership fields, including the producer version it reads from the plugin manifest.
 
 ```json
 {
@@ -134,21 +126,11 @@ The emitted envelope has this documentary shape. The runtime supplies all omitte
     "artifact_kind": "last-scan",
     "schema": { "name": "last-scan", "version": "1.1" }
   },
-  "payload": {
-    "provenance": {},
-    "documents": [],
-    "summary": {},
-    "gaps": []
-  }
+  "payload": { "provenance": {}, "documents": [], "summary": {}, "gaps": [] }
 }
 ```
 
-Required payload invariants:
-
-- `summary.total_issues` counts document issues only; gaps are counted separately in `summary.authoring`.
-- `summary.auto_fixable`, `summary.authoring`, and `summary.audit_only` match their arrays exactly.
-- `payload.provenance.is_git`, `worktree_hash`, and optional path-check flag are copied from context, not inferred.
-- Schema versions and category thresholds are unchanged.
+`scripts/validate-envelope-emit.js` runs inside `emit` and rejects the payload on any drift, so the summary must be exact rather than approximate: `summary.total_issues`, `auto_fixable`, and `audit_only` count `documents[].issues[]` only, while `summary.authoring` counts `gaps[]`. Gaps are never issues.
 
 ## Result contract
 

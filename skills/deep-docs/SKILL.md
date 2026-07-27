@@ -1,6 +1,6 @@
 ---
 name: deep-docs
-description: Use when the user wants to scan, garden, or audit project agent-instruction documents (CLAUDE.md / AGENTS.md / README.md). Triggers on `/deep-docs`, "scan documents", "garden CLAUDE.md", "audit docs", "document health", "stale docs", "문서 정비", "문서 스캔", "문서 감사", "문서 가드닝". Detects dead refs, moved paths, duplicate blocks, stale examples; auto-fixes via 4-option AskUserQuestion (apply / skip / skip+record / batch); reports audit-only items separately.
+description: Scan, garden, or audit a project's agent-instruction documents. Triggers on `/deep-docs`, "scan documents", "garden CLAUDE.md", "audit docs", "document health", "stale docs", "문서 정비", "문서 스캔", "문서 감사", "문서 가드닝".
 user-invocable: true
 ---
 
@@ -14,8 +14,8 @@ Resolve `<plugin-root>` from this loaded skill's location; do not derive it from
 
 | Work | Claude Code | Codex |
 |---|---|---|
-| scan / automatic re-scan | `Task(subagent_type="deep-docs:doc-scanner", ...)` | Spawn a generic subagent whose first action is to read `<plugin-root>/agents/doc-scanner.md`, then treat it as the execution contract. Give read/search, bounded state-file write, and terminal capabilities; writes are permitted to `<target-root>/.deep-docs/` only and terminal use is limited to the quoted Node runtime command. |
-| authoring draft | `Task(subagent_type="deep-docs:doc-author", ...)` | Spawn a generic subagent whose first action is to read `<plugin-root>/agents/doc-author.md`, then treat it as the execution contract. Give read/search only, no terminal, no write, edit, or apply-patch capability, and require the same structured result. |
+| scan / automatic re-scan | `Task(subagent_type="deep-docs:doc-scanner", ...)` | Spawn a generic subagent whose first action is to read `<plugin-root>/agents/doc-scanner.md` and treat it as the execution contract. Grant read/search, terminal limited to the quoted Node runtime command, and writes to `<target-root>/.deep-docs/` only. |
+| authoring draft | `Task(subagent_type="deep-docs:doc-author", ...)` | Spawn a generic subagent whose first action is to read `<plugin-root>/agents/doc-author.md` and treat it as the execution contract. Grant read/search only, no terminal, no write, edit, or apply-patch capability, and require the same structured result. |
 
 If generic subagents are unavailable, execute the loaded definition inline with the same capability limits and disclose the degraded dispatch. Never silently grant `doc-author` terminal or mutation capability. Preserve baseline-before-author ordering and whole-draft approval in every host.
 
@@ -30,26 +30,20 @@ If generic subagents are unavailable, execute the loaded definition inline with 
 
 ## Inputs
 
-- `scan`, `garden`, or `audit` as the single subcommand.
-- An empty or unknown argument requires the user to choose one of those three operations.
-- `<target-root>` is the target project's requested root, never the plugin installation root.
+`scan`, `garden`, or `audit` is the single subcommand; an empty or unknown argument requires the user to choose one of the three, and a mutating garden is never inferred from it. `<target-root>` is the target project's requested root, never the plugin installation root.
 
 ## `/deep-docs scan`
 
 1. Run the quoted Node runtime command with `scan-context --root "<target-root>"`. Add `--path-check-enabled` only when the user explicitly opts into host-dependent executable lookup.
 2. Dispatch `doc-scanner` through the mandatory host-routing table. Pass the immutable `ScanContextV1`, `<target-root>`, `<plugin-root>`, and the exact quoted runtime command. The scanner uses Read/Glob/Grep for semantic classification and follows `references/scan-rules.md`.
-3. The scanner may call `rename-history` for a dead-path candidate. Git-missing, non-Git, and unborn repositories yield an empty history; no agent guesses a successor.
-4. The scanner writes only `.deep-docs/scan-payload-request.json`, then invokes `emit --root "<target-root>" --request scan-payload-request.json`. Consume the returned artifact and `artifact_revision`; never synthesize envelope fields in prose.
-5. Report the three categories without conflation:
-   - `payload.documents[].issues[]` with `category: "auto-fix"`;
-   - `payload.gaps[]` with `category: "authoring"`;
-   - issues with `category: "audit-only"`.
+3. The scanner writes only `.deep-docs/scan-payload-request.json`, then invokes `emit --root "<target-root>" --request scan-payload-request.json`. Consume the returned artifact and `artifact_revision`; never synthesize envelope fields in prose.
+4. Report the three categories without conflation: auto-fix issues and audit-only issues both live in `payload.documents[].issues[]` under their own `category`, and authoring items live in `payload.gaps[]`.
 
 An empty document set is not an early exit. The scanner still evaluates root-only missing-doc guards for `CLAUDE.md`, `AGENTS.md`, and `ARCHITECTURE.md`; if no guard is met, report that no recommended document qualifies.
 
 ## Shared reuse contract for garden and audit
 
-1. Write a bounded request containing `artifact_path: ".deep-docs/last-scan.json"` and the literal `path_check_enabled` flag only when enabled, then call `reuse` through the quoted Node runtime. The runtime validates `envelope.producer === "deep-docs"`, `envelope.artifact_kind === "last-scan"`, `envelope.schema.name === "last-scan"`, `schema_version === "1.0"`, and `envelope.schema.version === "1.1"` before TTL, path-check, HEAD, and worktree facts.
+1. Write a bounded request containing `artifact_path: ".deep-docs/last-scan.json"` and the literal `path_check_enabled` flag only when enabled, then call `reuse` through the quoted Node runtime. The runtime validates `envelope.producer === "deep-docs"`, `envelope.artifact_kind === "last-scan"`, `envelope.schema.name === "last-scan"`, `schema_version === "1.0"`, and `envelope.schema.version === "1.1"` before Git, TTL, path-check, HEAD, and worktree facts.
 2. A reusable result supplies both an immutable artifact snapshot and its `artifact_revision`. Freeze that exact payload/revision pair for the entire session.
 3. Any `{ "reusable": false }` response dispatches the scanner route. Consume the newly emitted artifact and revision rather than retaining the rejected artifact.
 4. Non-Git reuse intentionally returns false; after re-scan, garden still freezes the new payload/revision pair for the current session.
@@ -60,7 +54,9 @@ An empty document set is not an early exit. The scanner still evaluates root-onl
 
 Process only auto-fix issues as edits. `size-warning`, rule/code contradictions, coverage gaps, and map/manual observations remain audit-only.
 
-For each issue, show the proposed diff and use the canonical 4+2 choice flow:
+Before prompting on an issue, obtain its `signature` and skip the prompt when that signature is already recorded in `.deep-docs/garden-ignored.json`. That list is permanent, not session-scoped.
+
+For each remaining issue, show the proposed diff and use the canonical 4+2 choice flow:
 
 - A: apply this issue;
 - B: skip once;
@@ -97,24 +93,7 @@ A session containing only B/C/E decisions does not invalidate the scan. The host
 
 ## Garden-ignore schema contract
 
-The runtime owns schema version 1 and computes records with these fields:
-
-```json
-{
-  "schema_version": 1,
-  "ignored": [
-    {
-      "signature": "sha256:<64 lowercase hex>",
-      "type": "dead-reference",
-      "path": "CLAUDE.md",
-      "content_preview": "src/auth/middleware.ts",
-      "ignored_at": "2026-04-17T10:05:00Z"
-    }
-  ]
-}
-```
-
-The `signature` command computes SHA-256 from `type`, `path`, and the first 200 Unicode code points of `content_preview`. For missing-doc, use the doc kind as preview; for thin-doc, use the existing document's first 200 code points. Do not hand-compute or hand-merge this file.
+The runtime owns `garden-ignored.json` at schema version 1 and computes each record's `signature` as `sha256:<64 lowercase hex>` over the issue `type`, `path`, and the first 200 Unicode code points of `content_preview`. For missing-doc use the doc kind as preview; for thin-doc use the existing document's first 200 code points. Obtain the value from the `signature` command and append it through `garden-ignore` — never hand-compute the digest or hand-merge the file.
 
 ## `/deep-docs audit`
 
@@ -123,13 +102,6 @@ The `signature` command computes SHA-256 from `type`, `path`, and the first 200 
 3. Apply `references/audit-metrics.md` exactly: size, freshness, reference accuracy, duplication, and map/manual ratio. Average only measurable scored metrics and round to one decimal place.
 4. Report per-document values, the overall band, recommendations, and audit-only observations. Audit never mutates project documents or state artifacts.
 
-## Stable classification and schema invariants
+## Schema invariants
 
-- Auto-fix: dead reference, moved path with exact Git evidence, stale command with a known replacement, and exact duplicate block outside a translation family.
-- Audit-only: size/organization, inferred contradiction, coverage gap, map/manual ratio, and uncertain command replacement.
-- Authoring: root-only missing/thin `CLAUDE.md`, `AGENTS.md`, or `ARCHITECTURE.md` after the documented manifest/source, size, coverage, and ignore guards.
-- Top-level envelope `schema_version` remains `"1.0"`; last-scan payload schema remains `"1.1"`. Do not change scoring thresholds, gap guards, the category trichotomy, or schema versions in this workflow.
-
-## No-argument behavior
-
-Ask which operation to perform: scan, garden, or audit. Do not infer a mutating garden operation from an empty argument.
+Top-level envelope `schema_version` remains `"1.0"`; last-scan payload schema remains `"1.1"`. Do not change scoring thresholds, gap guards, the category trichotomy, or schema versions in this workflow. The per-rule membership of auto-fix, authoring, and audit-only is fixed by `references/scan-rules.md`; an issue without an exact `suggested_value` is demoted to audit-only rather than promoted.
