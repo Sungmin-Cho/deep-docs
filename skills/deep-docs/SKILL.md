@@ -43,7 +43,7 @@ An empty document set is not an early exit. The scanner still evaluates root-onl
 
 ## Shared reuse contract for garden and audit
 
-1. Write a bounded request containing `artifact_path: ".deep-docs/last-scan.json"` and the literal `path_check_enabled` flag only when enabled, then call `reuse` through the quoted Node runtime. The runtime validates `envelope.producer === "deep-docs"`, `envelope.artifact_kind === "last-scan"`, `envelope.schema.name === "last-scan"`, `schema_version === "1.0"`, and `envelope.schema.version === "1.1"` before Git, TTL, path-check, HEAD, and worktree facts.
+1. Write a bounded request containing `artifact_path: ".deep-docs/last-scan.json"` and the literal `path_check_enabled` flag only when enabled, then call `reuse` through the quoted Node runtime. The runtime validates `envelope.producer === "deep-docs"`, `envelope.artifact_kind === "last-scan"`, `envelope.schema.name === "last-scan"`, `schema_version === "1.0"`, `envelope.schema.version === "1.1"`, and `envelope.producer_version` equal to the installed plugin version — so a release invalidates every cached artifact — before Git, TTL, path-check, HEAD, and worktree facts.
 2. A reusable result supplies both an immutable artifact snapshot and its `artifact_revision`. Freeze that exact payload/revision pair for the entire session.
 3. Any `{ "reusable": false }` response dispatches the scanner route. Consume the newly emitted artifact and revision rather than retaining the rejected artifact.
 4. Non-Git reuse intentionally returns false; after re-scan, garden still freezes the new payload/revision pair for the current session.

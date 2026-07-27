@@ -40,7 +40,7 @@ garden authoring sub-flow가 다음을 전달한다:
 
 ### 1. authoring-rules 로드
 
-`skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`를 Read로 로드한다 (`claude-md.md` / `agents-md.md` / `architecture-md.md`). 공통 원칙은 `authoring-rules/README.md` 참조.
+`skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`를 Read로 로드한다 (`claude-md.md` / `agents-md.md` / `architecture-md.md`). 공통 원칙은 `skills/deep-docs-workflow/references/authoring-rules/README.md` 참조.
 
 ### 2. 코드베이스 분석 (Glob / Grep / Read)
 
