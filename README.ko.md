@@ -134,7 +134,7 @@ Audit-only 항목은 항상 마지막에 참고 사항으로 표시되며 자동
 
 ## 스캔 아티팩트
 
-모든 스캔은 [claude-deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/claude-deep-suite)으로 wrap된 `.deep-docs/last-scan.json`을 기록합니다 (최상위 `schema_version` + `envelope` + `payload`). `garden`과 `audit`은 envelope 식별 정보, schema 버전, 10분 TTL, `envelope.git.head`, `payload.provenance.worktree_hash`가 모두 일치할 때만 이를 재사용하며, 그렇지 않으면 스캔을 다시 실행합니다. non-Git 대상에는 신뢰할 수 있는 변경 감지기가 없으므로 재사용은 fail-closed되고 envelope은 sentinel `git` 블록을 emit합니다.
+모든 스캔은 [claude-deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/claude-deep-suite)으로 wrap된 `.deep-docs/last-scan.json`을 기록합니다 (최상위 `schema_version` + `envelope` + `payload`). `garden`과 `audit`은 envelope 식별 정보, schema 버전, `envelope.producer_version`(플러그인 릴리스가 캐시된 아티팩트를 전부 무효화합니다), 10분 TTL, `path_check_enabled` 설정, `envelope.git.head`, `payload.provenance.worktree_hash`가 모두 일치할 때만 이를 재사용하며, 그렇지 않으면 스캔을 다시 실행합니다. non-Git 대상에는 신뢰할 수 있는 변경 감지기가 없으므로 재사용은 fail-closed되고 envelope은 sentinel `git` 블록을 emit합니다.
 
 ## 링크
 

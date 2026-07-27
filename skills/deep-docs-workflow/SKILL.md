@@ -19,10 +19,10 @@ The host must not directly write garden-ignored.json or delete last-scan.json. T
 
 ## References
 
-- `references/scan-rules.md`: fixed classification, root-only authoring guards, and scanner mapping.
-- `references/audit-metrics.md`: score definitions over Node-produced fields.
-- `references/scan-filters/`: executable Node source/field mappings and edge contracts.
-- `references/authoring-rules/`: CLAUDE/AGENTS/ARCHITECTURE skeletons and the cross-document rules.
+- `<plugin-root>/skills/deep-docs-workflow/references/scan-rules.md`: fixed classification, root-only authoring guards, and scanner mapping.
+- `<plugin-root>/skills/deep-docs-workflow/references/audit-metrics.md`: score definitions over Node-produced fields.
+- `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/`: executable Node source/field mappings and edge contracts.
+- `<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/`: CLAUDE/AGENTS/ARCHITECTURE skeletons and the cross-document rules.
 
 ## Invariants
 

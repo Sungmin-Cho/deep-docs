@@ -52,14 +52,14 @@ garden authoring sub-flow가 다음을 전달한다:
 
 ### 3. mode 분기
 
-- **`create`**: 공식 골격(`authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함, 자명한 관행·linter 강제 스타일·파일별 설명은 제외.
+- **`create`**: 공식 골격(`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함, 자명한 관행·linter 강제 스타일·파일별 설명은 제외.
 - **`restructure`**: 기존 문서 파싱 → 고유 콘텐츠 식별 → 골격 재배치 + 누락 섹션 보강, 고유 콘텐츠 보존.
   - **"재생성 가능"(→ `removal_candidates`)** = 코드/빌드설정/공식 규칙에서 **직접 도출 가능한** 문장만.
   - **그 외 전부 `preserved_blocks`로 기본 보존(보수적 편향)** — 애매하면 보존(default-keep).
 
 ### 4. cross-document 연결 + 길이 가드 + gitignore 가드
 
-- **cross-document 연결** (`authoring-rules/README.md` D9/D13): CLAUDE/AGENTS 생성 시 ARCHITECTURE.md가 **이미 존재하거나 같은 garden 세션에서 적용 확정된 경우에만** "코드 구조는 ARCHITECTURE.md 참조" 한 줄 포인터 삽입(`@import` 아님). **거부된/미존재 문서로의 포인터 금지**(dead-reference 생성 방지).
+- **cross-document 연결** (`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/README.md` D9/D13): CLAUDE/AGENTS 생성 시 ARCHITECTURE.md가 **이미 존재하거나 같은 garden 세션에서 적용 확정된 경우에만** "코드 구조는 ARCHITECTURE.md 참조" 한 줄 포인터 삽입(`@import` 아님). **거부된/미존재 문서로의 포인터 금지**(dead-reference 생성 방지).
 - **AGENTS.md 우선 단일 소스 (D13)**: 공용 지침은 AGENTS.md에 두고, CLAUDE.md는 첫 줄 `@AGENTS.md` import + Claude Code 특화 내용만 남는 **thin wrapper**로 작성한다. import 역시 AGENTS.md가 존재/세션 확정된 경우에만 삽입하고, 아니면 CLAUDE.md 단독 full 골격 fallback을 쓴다. `agents-md` 작업에 이관 소스(기존 CLAUDE.md)가 첨부되면 런타임 공용 블록을 draft로 흡수하고, Claude 특화 블록은 넣지 않는다. 심볼릭 링크 공존은 사용하지 않는다.
 - **길이 가드(soft 목표)**: CLAUDE thin wrapper ≤30줄 / 단독 fallback ≤100줄(hard ceiling 200, 초과는 size-warning 비차단) / AGENTS ≤100줄 + ≤32KiB 근사(영문 ~60B/줄 기준 32KiB≈540줄; 한글/긴 줄은 보수적 하향) / ARCHITECTURE 100~300줄. **줄 수에는 hard fail 없음** — 과압축으로 정보를 잃지 않는다. AGENTS 32KiB의 **정확한** byte 차단은 승인된 `authoring-commit`이 수행한다(doc-author의 byte는 heuristic).
 - **gitignore 가드**: `.gitignore`로 ignored된 경로(특히 `docs/`)에는 생성을 제안하지 않는다 (scan-side 가드와 대칭).

@@ -51,7 +51,7 @@ Runtime의 `documents[].references`를 사용한다. Fenced/indented code exclus
 - `path`: Read/Glob으로 실제 존재와 의미를 확인한다.
 - `symbol`: Grep으로 정의를 확인한다.
 - `env`: 프로젝트의 실제 configuration examples에서 확인한다.
-- `cli`: `package_scripts`와 `scan-filters/cli-whitelist.md`의 static system set을 사용한다. Host-dependent path probing은 context의 flag가 true일 때만 고려한다.
+- `cli`: `package_scripts`와 `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/cli-whitelist.md`의 static system set을 사용한다. Host-dependent path probing은 context의 flag가 true일 때만 고려한다.
 
 Fence 내부 예시는 dead-reference 입력이 아니다.
 
