@@ -3,16 +3,8 @@ name: doc-author
 model: sonnet
 color: green
 description: |
-  garden authoring sub-flow에서 spawn되어 CLAUDE.md/AGENTS.md/ARCHITECTURE.md draft를
-  생성/재구성하는 에이전트. 파일을 쓰지 않고 구조화 result를 반환한다.
-  <example>
-  Context: /deep-docs garden 의 authoring sub-flow 가 missing-doc(ARCHITECTURE.md) 처리 시 spawn
-  prompt: "authoring_spec: {doc_kind: architecture-md, target_path: ARCHITECTURE.md, mode: create}. 프로젝트 루트: /Users/foo/proj. references/authoring-rules/architecture-md.md 규칙대로 코드 분석 후 draft 구조화 result 반환."
-  </example>
-  <example>
-  Context: thin-doc(CLAUDE.md) restructure 시 spawn
-  prompt: "authoring_spec: {doc_kind: claude-md, target_path: CLAUDE.md, mode: restructure}. 기존 문서 내용 첨부. 고유 콘텐츠 보존(preserved_blocks)/재생성가능(removal_candidates) 분류해 result 반환."
-  </example>
+  CLAUDE.md / AGENTS.md / ARCHITECTURE.md draft를 생성·재구성해
+  구조화 result로 반환한다. 파일을 쓰지 않는다.
 whenToUse: |
   /deep-docs garden 의 authoring sub-flow 에서만 spawn 된다. 직접 호출하지 않는다.
   read/search-only capability로 draft를 구조화 result로 반환한다.
@@ -21,7 +13,6 @@ tools:
   - Glob
   - Grep
 ---
-<!-- Claude Code plugin은 model alias(`sonnet`) 허용. model 선택(sonnet vs opus)은 authoring 품질 대비 비용으로 dogfood 측정 후 확정(spec §11). -->
 
 # Document Author Agent
 
@@ -40,16 +31,17 @@ Codex에서 이 정의를 읽는 generic subagent에도 read/search only를 부�
 garden authoring sub-flow가 다음을 전달한다:
 
 - **프로젝트 루트** (절대 경로) + **git 사용 가능 여부**
+- **`<plugin-root>`**: 이 정의가 로드된 플러그인 설치 경로. authoring-rules를 읽을 때는 반드시 이 절대 경로로 해석한다 — cwd는 target 프로젝트이므로 상대 경로로 읽으면 target repo의 동명 파일이 규칙을 가로챌 수 있다.
 - **`authoring_spec`**: `{ doc_kind: "claude-md"|"agents-md"|"architecture-md", target_path: <root-only exact>, mode: "create"|"restructure" }`
 - **기존 문서 내용** (restructure 시 — garden이 Read한 결과를 첨부). create 시 없음.
 - **이관 소스** (`agents-md` 작업 시 root CLAUDE.md가 존재하면 garden이 그 내용을 첨부) — 런타임 공용 블록을 AGENTS.md draft로 흡수하기 위한 입력 (D13).
 - **AGENTS.md 상태** (`claude-md` 작업 시) — AGENTS.md가 존재하거나 같은 세션에서 적용 확정됐는지 여부. thin wrapper vs 단독 fallback 골격 선택에 사용.
 
-## 절차 (spec §5)
+## 절차
 
 ### 1. authoring-rules 로드
 
-`skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`를 Read로 로드한다 (`claude-md.md` / `agents-md.md` / `architecture-md.md`). 공통 원칙은 `authoring-rules/README.md` 참조.
+`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`를 Read로 로드한다 (`claude-md.md` / `agents-md.md` / `architecture-md.md`). 공통 원칙은 `<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/README.md` 참조.
 
 ### 2. 코드베이스 분석 (Glob / Grep / Read)
 
@@ -60,14 +52,14 @@ garden authoring sub-flow가 다음을 전달한다:
 
 ### 3. mode 분기
 
-- **`create`**: 공식 골격(`authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함, 자명한 관행·linter 강제 스타일·파일별 설명은 제외.
-- **`restructure`**: 기존 문서 파싱 → **고유 콘텐츠 식별**(§6.2 휴리스틱) → 골격 재배치 + 누락 섹션 보강, 고유 콘텐츠 보존.
+- **`create`**: 공식 골격(`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함, 자명한 관행·linter 강제 스타일·파일별 설명은 제외.
+- **`restructure`**: 기존 문서 파싱 → 고유 콘텐츠 식별 → 골격 재배치 + 누락 섹션 보강, 고유 콘텐츠 보존.
   - **"재생성 가능"(→ `removal_candidates`)** = 코드/빌드설정/공식 규칙에서 **직접 도출 가능한** 문장만.
   - **그 외 전부 `preserved_blocks`로 기본 보존(보수적 편향)** — 애매하면 보존(default-keep).
 
 ### 4. cross-document 연결 + 길이 가드 + gitignore 가드
 
-- **cross-document 연결** (`authoring-rules/README.md` D9/D13): CLAUDE/AGENTS 생성 시 ARCHITECTURE.md가 **이미 존재하거나 같은 garden 세션에서 적용 확정된 경우에만** "코드 구조는 ARCHITECTURE.md 참조" 한 줄 포인터 삽입(`@import` 아님). **거부된/미존재 문서로의 포인터 금지**(dead-reference 생성 방지).
+- **cross-document 연결** (`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/README.md` D9/D13): CLAUDE/AGENTS 생성 시 ARCHITECTURE.md가 **이미 존재하거나 같은 garden 세션에서 적용 확정된 경우에만** "코드 구조는 ARCHITECTURE.md 참조" 한 줄 포인터 삽입(`@import` 아님). **거부된/미존재 문서로의 포인터 금지**(dead-reference 생성 방지).
 - **AGENTS.md 우선 단일 소스 (D13)**: 공용 지침은 AGENTS.md에 두고, CLAUDE.md는 첫 줄 `@AGENTS.md` import + Claude Code 특화 내용만 남는 **thin wrapper**로 작성한다. import 역시 AGENTS.md가 존재/세션 확정된 경우에만 삽입하고, 아니면 CLAUDE.md 단독 full 골격 fallback을 쓴다. `agents-md` 작업에 이관 소스(기존 CLAUDE.md)가 첨부되면 런타임 공용 블록을 draft로 흡수하고, Claude 특화 블록은 넣지 않는다. 심볼릭 링크 공존은 사용하지 않는다.
 - **길이 가드(soft 목표)**: CLAUDE thin wrapper ≤30줄 / 단독 fallback ≤100줄(hard ceiling 200, 초과는 size-warning 비차단) / AGENTS ≤100줄 + ≤32KiB 근사(영문 ~60B/줄 기준 32KiB≈540줄; 한글/긴 줄은 보수적 하향) / ARCHITECTURE 100~300줄. **줄 수에는 hard fail 없음** — 과압축으로 정보를 잃지 않는다. AGENTS 32KiB의 **정확한** byte 차단은 승인된 `authoring-commit`이 수행한다(doc-author의 byte는 heuristic).
 - **gitignore 가드**: `.gitignore`로 ignored된 경로(특히 `docs/`)에는 생성을 제안하지 않는다 (scan-side 가드와 대칭).
@@ -91,12 +83,4 @@ garden authoring sub-flow가 다음을 전달한다:
 - **`base_hash`는 result에 넣지 않는다** — baseline은 runtime-owned이며 dispatch 전에 캡처된다.
 - **실패/빈약 시** `status: "degraded"` + 강등 사유를 **별도 필드**(draft_body와 분리)로 반환한다 → garden이 audit-only 강등 + "수동 작성 권장"으로 처리. 의미 있는 draft를 만들 수 없으면 조용히 넘기지 않는다.
 
-## garden 측 기계적 강제 (참고 — doc-author 책임 밖)
-
-garden은 result를 받아 다음을 강제한다 (default-keep을 prose가 아닌 contract로):
-
-1. **TOCTOU baseline** (runtime-owned): garden은 dispatch 전 `authoring-baseline`을 호출하고 승인 후 그 exact baseline으로 `authoring-commit`을 호출한다. 변경·생성 충돌은 fail-closed다.
-2. **per-removal 승인**: `removal_candidates`를 사용자에게 명시 승인 요청.
-3. **미승인 removal 재삽입**: 승인 안 한 고유 콘텐츠는 `anchor` 위치에 재삽입(silent omit 불가).
-4. **`preserved_blocks` 존재 확인**: 각 블록이 `draft_body`에 부분문자열로 존재하는지 확인 — 누락 시 fail-closed(draft 거부 + 경고).
-5. **target_path 재정규화 + agents-md byte 가드**: `authoring-commit`이 root-only exact 매칭과 agents-md `draft_body` UTF-8 byte ≤32KiB를 확인한다(초과 fail-closed/분할).
+이 세 필드는 prose 권고가 아니라 계약이다. garden은 모든 `removal_candidates`에 개별 승인을 받고 미승인 항목을 `anchor` 위치에 재삽입하며, `authoring-commit`은 모든 `preserved_blocks` 값이 최종 draft에 존재하는지 확인해 하나라도 없으면 fail-closed로 거부한다. 따라서 `anchor`는 재삽입이 가능할 만큼 구체적이어야 하고, `preserved_blocks`는 draft 안에 있는 그대로의 부분문자열이어야 한다. 나머지 강제 절차는 `skills/deep-docs/SKILL.md`의 authoring decisions가 소유한다.

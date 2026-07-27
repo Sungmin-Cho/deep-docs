@@ -134,7 +134,7 @@ The overall score is rounded to one decimal. If a doc has no outbound references
 
 ## Scan artifact
 
-Every scan writes `.deep-docs/last-scan.json`, wrapped in the [claude-deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/claude-deep-suite) (top-level `schema_version` + `envelope` + `payload`). `garden` and `audit` reuse it only when the envelope identity, schema version, 10-minute TTL, `envelope.git.head`, and `payload.provenance.worktree_hash` all match; otherwise the scan re-runs. A non-Git target has no trustworthy change detector, so reuse fails closed and the envelope emits a sentinel `git` block.
+Every scan writes `.deep-docs/last-scan.json`, wrapped in the [claude-deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/claude-deep-suite) (top-level `schema_version` + `envelope` + `payload`). `garden` and `audit` reuse it only when the envelope identity, schema version, `envelope.producer_version` (so a plugin release invalidates every cached artifact), 10-minute TTL, the `path_check_enabled` setting, `envelope.git.head`, and `payload.provenance.worktree_hash` all match; otherwise the scan re-runs. A non-Git target has no trustworthy change detector, so reuse fails closed and the envelope emits a sentinel `git` block.
 
 ## Links
 
