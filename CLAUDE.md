@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # deep-docs — Project Guide for Claude
 
 Document gardening agent that validates the freshness of agent instruction files (`CLAUDE.md`, `AGENTS.md`, project docs) and auto-repairs them — detecting stale references, moved paths, duplicates, and applying safe fixes with user confirmation.
@@ -50,51 +52,6 @@ git push
   into an agent definition.
 
 **Do NOT inline release notes in this CLAUDE.md** — CHANGELOG is the single source of truth.
-
----
-
-## Directory Structure
-
-```
-deep-docs/
-├── .claude-plugin/plugin.json
-├── .codex-plugin/plugin.json          # plugin manifest
-├── package.json                         # private Node 22 ESM package; four portable npm gates
-├── agents/
-│   ├── doc-scanner.md                  # spawned subagent — Steps 1–13 (discover, extract, validate,
-│   │                                    # track, freshen, dedup, size-check, rules, coverage, ratio,
-│   │                                    # gap-detect, emit, save to M3 envelope)
-│   └── doc-author.md                   # authoring subagent — drafts CLAUDE/AGENTS/ARCHITECTURE
-│                                        # (Read/Glob/Grep only — no Write/Bash; structured result)
-├── skills/
-│   ├── deep-docs/
-│   │   └── SKILL.md                    # /deep-docs scan|garden|audit — user-invocable entry skill
-│   │                                    # (Claude Code slash + Codex $deep-docs:deep-docs entry)
-│   └── deep-docs-workflow/
-│       ├── SKILL.md                    # core workflow reference (auto-loaded, not user-invocable)
-│       └── references/
-│           ├── scan-rules.md           # Rules 1–4 auto-fix, Rules 5–8 audit-only, Rule 9 authoring
-│           ├── audit-metrics.md        # scoring axes (size, freshness, ref-accuracy, duplication)
-│           ├── authoring-rules/        # doc skeletons (claude-md, agents-md, architecture-md,
-│           │                            # README index + cross-doc rules)
-│           └── scan-filters/           # heuristic helpers (code-fence, reference-extraction,
-│                                        # translation-pair, cli-whitelist, worktree-hash,
-│                                        # freshness-timestamp)
-├── scripts/
-│   ├── deep-docs-runtime.js            # nine-command deterministic runtime entry
-│   ├── runtime/                        # scan, Git, artifact, state, and authoring modules
-│   ├── validate-envelope-emit.js       # envelope schema self-test (npm run validate:envelope)
-│   └── verify-fixes.js                 # portable structural release-lint (npm run verify:fixes)
-├── tests/
-│   └── fixtures/
-│       ├── sample-last-scan.json       # canonical M3-envelope-wrapped payload (schema 1.1, gaps[])
-│       └── sample-last-scan-invalid-gap.json   # negative fixture — nested target_path rejected
-├── CHANGELOG.md / CHANGELOG.ko.md
-├── README.md / README.ko.md
-└── .deep-docs/                          # artifact directory (auto-created on first run)
-    ├── last-scan.json                  # scan results (M3 envelope, 10-min TTL)
-    └── garden-ignored.json             # rejected fixes (signature-based skip list, permanent)
-```
 
 ---
 
@@ -223,8 +180,6 @@ Session state (batch accept / reject type sets) is in-memory only and resets at 
 
 ### Node runtime / cross-platform portability
 
-- Support Node.js 22 on native Windows, macOS, and Linux. Git is optional;
-  Git Bash and Python are not required.
 - Resolve the plugin root from `import.meta.url`, never from the target cwd or a
   required environment variable.
 - Resolve target roots to their physical absolute path and preserve native Windows
