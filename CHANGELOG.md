@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.2] — 2026-07-27
+
+### Changed
+
+- Agent-facing documentation consolidated so the plugin follows the AGENTS-first policy it recommends to target projects: `AGENTS.md` now holds every shared contract and `CLAUDE.md` is a thin `@AGENTS.md` wrapper with Claude Code-specific notes only.
+- Skill and agent instructions trimmed to their contracts, with conditional detail left to the existing workflow references instead of being restated.
+- No behavior change: scan, garden, and audit run exactly as in 1.6.1, and envelope `1.0` / last-scan payload `1.1` are unchanged.
+
+### Fixed
+
+- Documented reuse guard now matches the runtime: the 10-minute TTL is measured from the artifact's recorded `generated_at` (a future-dated artifact is rejected), and a non-Git root always re-scans.
+- Documented worktree-hash construction and garden-ignore signature composition corrected to match what the runtime actually computes.
+- Garden's rule to skip a prompt whose signature is already recorded is now stated in the skill that runs the flow, not only in the maintainer guide.
+- Release instructions replaced the stale manual marketplace edit with the marketplace repo's own re-pin command.
+
 ## [1.6.1] — 2026-07-21
 
 ### Fixed

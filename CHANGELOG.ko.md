@@ -7,6 +7,21 @@
 
 ---
 
+## [1.6.2] — 2026-07-27
+
+### 변경됨
+
+- 이 플러그인이 대상 프로젝트에 권장하는 AGENTS-first 정책을 스스로 따르도록 에이전트 문서를 통합했습니다: 공용 계약은 전부 `AGENTS.md`에 두고, `CLAUDE.md`는 Claude Code 특화 내용만 담는 thin `@AGENTS.md` wrapper가 되었습니다.
+- 스킬과 에이전트 지침을 계약 중심으로 정리하고, 조건부 상세는 재기술 대신 기존 workflow references에 맡겼습니다.
+- 동작 변경 없음: scan, garden, audit 은 1.6.1과 동일하게 실행되며 envelope `1.0` / last-scan payload `1.1` 도 그대로입니다.
+
+### 수정됨
+
+- 문서에 기술된 reuse guard 를 런타임과 일치시켰습니다: 10분 TTL은 아티팩트에 기록된 `generated_at` 기준이며(미래 시각 아티팩트는 거부), 비-Git 루트는 항상 재스캔합니다.
+- worktree hash 구성 방식과 garden-ignore signature 계산 방식 설명을 런타임 실제 동작에 맞게 정정했습니다.
+- 이미 기록된 signature 의 프롬프트를 건너뛰는 garden 규칙을 유지보수 가이드뿐 아니라 해당 흐름을 실행하는 스킬에 명시했습니다.
+- 릴리스 안내를 오래된 수동 마켓플레이스 편집 대신 마켓플레이스 저장소의 re-pin 커맨드로 교체했습니다.
+
 ## [1.6.1] — 2026-07-21
 
 ### 수정됨
