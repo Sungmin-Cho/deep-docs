@@ -66,6 +66,11 @@ reuse guard: a config toggle must invalidate the artifact, and silent omission h
 5. `envelope.git.head` matches current HEAD
 6. `payload.provenance.worktree_hash` matches a fresh recomputation
 
+Condition 1 runs the full envelope validation, which includes the
+`producer_version === plugin.json.version` equality check — so **releasing a new plugin version
+invalidates every cached artifact**, and the first `garden` or `audit` after a bump always
+re-scans. That is intended: a version bump can change how a payload is classified.
+
 The hash construction, its `.deep-docs` exclusion and the full edge matrix are in
 `skills/deep-docs-workflow/references/scan-filters/worktree-hash.md`; the implementation is
 `evaluateReuse` and `hashRepositoryProjection` under `scripts/runtime/`. Those two, this file,

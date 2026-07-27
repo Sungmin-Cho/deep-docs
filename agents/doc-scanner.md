@@ -40,7 +40,7 @@ tools:
 
 ### 1. Document inventory
 
-Context에 포함된 문서만 분류한다. 후보 범위와 ignore projection은 `references/scan-rules.md`의 executable candidate scope가 정의하며, runtime이 제외한 symlink, ignored untracked candidate, state tree, vendor/build tree를 다시 포함하지 않는다.
+Context에 포함된 문서만 분류한다. 후보 범위와 ignore projection은 `skills/deep-docs-workflow/references/scan-rules.md`의 executable candidate scope가 정의하며, runtime이 제외한 symlink, ignored untracked candidate, state tree, vendor/build tree를 다시 포함하지 않는다.
 
 문서가 0개여도 종료하지 않고 Step 9의 missing-doc guards를 평가한다.
 
@@ -99,7 +99,7 @@ Runtime CommonMark segments 안에서만 exact 3-line windows를 비교한다. S
 
 ### 9. Missing/thin document gaps
 
-Root-only `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`만 후보다. 각 gap의 전제 조건, severity, 그리고 AGENTS.md 우선 단일 소스 정책(authoring-rules D13 — 공용 지침은 AGENTS.md, CLAUDE.md는 `@AGENTS.md` import + Claude Code 특화 내용만 담는 thin wrapper)은 `references/scan-rules.md`의 authoring rule이 정의한다. Ignored target은 제외하고, monorepo package-local document는 v2까지 생성하지 않는다.
+Root-only `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`만 후보다. 각 gap의 전제 조건, severity, 그리고 AGENTS.md 우선 단일 소스 정책(authoring-rules D13 — 공용 지침은 AGENTS.md, CLAUDE.md는 `@AGENTS.md` import + Claude Code 특화 내용만 담는 thin wrapper)은 `skills/deep-docs-workflow/references/scan-rules.md`의 authoring rule이 정의한다. Ignored target은 제외하고, monorepo package-local document는 v2까지 생성하지 않는다.
 
 emit이 fail-closed로 검증하는 매핑은 반드시 지킨다.
 
