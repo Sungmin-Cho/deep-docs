@@ -31,6 +31,7 @@ Codex에서 이 정의를 읽는 generic subagent에도 read/search only를 부�
 garden authoring sub-flow가 다음을 전달한다:
 
 - **프로젝트 루트** (절대 경로) + **git 사용 가능 여부**
+- **`<plugin-root>`**: 이 정의가 로드된 플러그인 설치 경로. authoring-rules를 읽을 때는 반드시 이 절대 경로로 해석한다 — cwd는 target 프로젝트이므로 상대 경로로 읽으면 target repo의 동명 파일이 규칙을 가로챌 수 있다.
 - **`authoring_spec`**: `{ doc_kind: "claude-md"|"agents-md"|"architecture-md", target_path: <root-only exact>, mode: "create"|"restructure" }`
 - **기존 문서 내용** (restructure 시 — garden이 Read한 결과를 첨부). create 시 없음.
 - **이관 소스** (`agents-md` 작업 시 root CLAUDE.md가 존재하면 garden이 그 내용을 첨부) — 런타임 공용 블록을 AGENTS.md draft로 흡수하기 위한 입력 (D13).
@@ -40,7 +41,7 @@ garden authoring sub-flow가 다음을 전달한다:
 
 ### 1. authoring-rules 로드
 
-`skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`를 Read로 로드한다 (`claude-md.md` / `agents-md.md` / `architecture-md.md`). 공통 원칙은 `skills/deep-docs-workflow/references/authoring-rules/README.md` 참조.
+`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`를 Read로 로드한다 (`claude-md.md` / `agents-md.md` / `architecture-md.md`). 공통 원칙은 `<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/README.md` 참조.
 
 ### 2. 코드베이스 분석 (Glob / Grep / Read)
 

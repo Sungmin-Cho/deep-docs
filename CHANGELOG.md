@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Documented reuse guard now matches the runtime: the 10-minute TTL is measured from the artifact's recorded `generated_at` (a future-dated artifact is rejected), and a non-Git root always re-scans.
 - Documented worktree-hash construction and garden-ignore signature composition corrected to match what the runtime actually computes.
-- Garden's rule to skip a prompt whose signature is already recorded is now stated in the skill that runs the flow, not only in the maintainer guide.
+- Agent and skill instructions now resolve their reference documents through the plugin installation path, so a scanned project cannot substitute its own same-named file for the plugin's classification or authoring rules.
 - Release instructions replaced the stale manual marketplace edit with the marketplace repo's own re-pin command.
 
 ## [1.6.1] — 2026-07-21

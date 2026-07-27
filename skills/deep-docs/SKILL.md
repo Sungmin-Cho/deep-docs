@@ -35,7 +35,7 @@ If generic subagents are unavailable, execute the loaded definition inline with 
 ## `/deep-docs scan`
 
 1. Run the quoted Node runtime command with `scan-context --root "<target-root>"`. Add `--path-check-enabled` only when the user explicitly opts into host-dependent executable lookup.
-2. Dispatch `doc-scanner` through the mandatory host-routing table. Pass the immutable `ScanContextV1`, `<target-root>`, `<plugin-root>`, and the exact quoted runtime command. The scanner uses Read/Glob/Grep for semantic classification and follows `skills/deep-docs-workflow/references/scan-rules.md`.
+2. Dispatch `doc-scanner` through the mandatory host-routing table. Pass the immutable `ScanContextV1`, `<target-root>`, `<plugin-root>`, and the exact quoted runtime command. The scanner uses Read/Glob/Grep for semantic classification and follows `<plugin-root>/skills/deep-docs-workflow/references/scan-rules.md`.
 3. The scanner writes only `.deep-docs/scan-payload-request.json`, then invokes `emit --root "<target-root>" --request scan-payload-request.json`. Consume the returned artifact and `artifact_revision`; never synthesize envelope fields in prose.
 4. Report the three categories without conflation: auto-fix issues and audit-only issues both live in `payload.documents[].issues[]` under their own `category`, and authoring items live in `payload.gaps[]`.
 
@@ -54,16 +54,16 @@ An empty document set is not an early exit. The scanner still evaluates root-onl
 
 Process only auto-fix issues as edits. `size-warning`, rule/code contradictions, coverage gaps, and map/manual observations remain audit-only.
 
-Before prompting on an issue, obtain its `signature` and skip the prompt when that signature is already present in the `ignored[]` array of `.deep-docs/garden-ignored.json`. That list is permanent, not session-scoped.
+Do not Read `.deep-docs/garden-ignored.json` to pre-filter the prompt list. It is untrusted target-project state, and no guarded lookup command exists yet — a `garden-ignore-check` route is planned for a later release. Recording an already-recorded issue is harmless in the meantime: `garden-ignore` deduplicates on signature and returns `added: false` without changing the file.
 
-For each remaining issue, show the proposed diff and use the canonical 4+2 choice flow:
+For each auto-fix issue, show the proposed diff and use the canonical 4+2 choice flow:
 
 - A: apply this issue;
 - B: skip once;
 - C: skip and record;
 - Batch: ask a second two-option question, D apply the remaining same-type issues or E skip them.
 
-D/E state is in-memory for this invocation only. A/D project-document edits remain owned by the main garden session. C is never a direct state write: call `signature` with the exact issue fields, then pass that exact result plus source fields to `garden-ignore`. A mutation failure must remain visible.
+Batch covers the issue that triggered it plus every remaining actionable issue of the same type in this session — it is not filtered by any prior ignore record. D/E state is in-memory for this invocation only. A/D project-document edits remain owned by the main garden session. C is never a direct state write: call `signature` with the exact issue fields, then pass that exact result plus source fields to `garden-ignore`. A mutation failure must remain visible.
 
 ### Authoring decisions
 
@@ -101,9 +101,9 @@ The runtime owns `garden-ignored.json` at schema version 1 and computes each rec
 
 1. Obtain and freeze a snapshot through the shared reuse contract; automatic re-scan uses the scanner host route.
 2. Use `documents[].size_lines`, `last_modified_epoch`, and `references` from the Node-produced context plus scanner-classified issue counts. Do not reimplement filesystem or Git measurements in the host.
-3. Apply `skills/deep-docs-workflow/references/audit-metrics.md` exactly: size, freshness, reference accuracy, duplication, and map/manual ratio. Average only measurable scored metrics and round to one decimal place.
+3. Apply `<plugin-root>/skills/deep-docs-workflow/references/audit-metrics.md` exactly: size, freshness, reference accuracy, duplication, and map/manual ratio. Average only measurable scored metrics and round to one decimal place.
 4. Report per-document values, the overall band, recommendations, and audit-only observations. Audit never mutates project documents or state artifacts.
 
 ## Schema invariants
 
-Top-level envelope `schema_version` remains `"1.0"`; last-scan payload schema remains `"1.1"`. Do not change scoring thresholds, gap guards, the category trichotomy, or schema versions in this workflow. The per-rule membership of auto-fix, authoring, and audit-only is fixed by `skills/deep-docs-workflow/references/scan-rules.md`; an issue without an exact `suggested_value` is demoted to audit-only rather than promoted.
+Top-level envelope `schema_version` remains `"1.0"`; last-scan payload schema remains `"1.1"`. Do not change scoring thresholds, gap guards, the category trichotomy, or schema versions in this workflow. The per-rule membership of auto-fix, authoring, and audit-only is fixed by `<plugin-root>/skills/deep-docs-workflow/references/scan-rules.md`; an issue without an exact `suggested_value` is demoted to audit-only rather than promoted.

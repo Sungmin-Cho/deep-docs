@@ -16,8 +16,8 @@ Version: `node -p "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.
 
 ## Surfaces
 
-Dual manifests, `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`
-(`skills: "./skills/"`), over one entry skill (`skills/deep-docs/SKILL.md`), one contract skill
+Dual manifests, `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` (the latter alone
+carries `skills: "./skills/"`), over one entry skill (`skills/deep-docs/SKILL.md`), one contract skill
 with its `references/` (`skills/deep-docs-workflow/`), and two agents. `agents/doc-author.md` is
 read/search only and must never be granted terminal, write, edit or apply-patch capability on
 any host.
@@ -81,13 +81,13 @@ pair for the whole session, and freeze the newly emitted pair instead whenever r
 
 ## Garden
 
-- Before prompting on an auto-fix issue, obtain its `signature` and skip the prompt when it is
-  already recorded in `.deep-docs/garden-ignored.json`. That list is permanent, not
-  session-scoped.
 - The prompt is four options then two, because `AskUserQuestion` caps `options.maxItems` at 4:
   apply / skip / skip-and-record / Batch, then batch-apply or batch-reject.
 - `garden-ignored.json` is runtime-owned: take the value from the `signature` command and append
-  through `garden-ignore`. Never hand-compute or hand-merge it.
+  through `garden-ignore`. Never hand-compute or hand-merge it, and never Read it to pre-filter
+  the prompt list — it is untrusted target-project state, and no guarded lookup command exists
+  yet. Re-recording is harmless: `garden-ignore` deduplicates on signature and returns
+  `added: false` without touching the file.
 - After at least one applied document edit or authoring commit, call `scan-invalidate` exactly
   once with the frozen `artifact_revision`. `matched` invalidated that snapshot; `changed` means
   a newer artifact superseded it and is preserved; `absent` is idempotent success.
@@ -154,6 +154,6 @@ test in `tests/plugin-contract.test.js`. Bump all eight together, add the entry 
 CHANGELOG files, and keep release notes out of this file.
 
 Re-pinning the marketplace is the suite repo's job, not a hand-edit here: from
-`claude-deep-suite`, run `npm run release:bump -- deep-docs <sha40>` and then
-`npm run preflight`. `release:bump` writes `.claude-plugin/marketplace.json` only —
+`claude-deep-suite`, run `npm run release:bump -- deep-docs <sha40>`, which regenerates the
+docs and runs `preflight` as its own gate. It writes `.claude-plugin/marketplace.json` only —
 `.agents/plugins/marketplace.json` still needs a manual sync.
