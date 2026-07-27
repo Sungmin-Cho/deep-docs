@@ -13,7 +13,7 @@
 
 - 이 플러그인이 대상 프로젝트에 권장하는 AGENTS-first 정책을 스스로 따르도록 에이전트 문서를 통합했습니다: 공용 계약은 전부 `AGENTS.md`에 두고, `CLAUDE.md`는 Claude Code 특화 내용만 담는 thin `@AGENTS.md` wrapper가 되었습니다.
 - 스킬과 에이전트 지침을 계약 중심으로 정리하고, 조건부 상세는 재기술 대신 기존 workflow references에 맡겼습니다.
-- 동작 변경 없음: scan, garden, audit 은 1.6.1과 동일하게 실행되며 envelope `1.0` / last-scan payload `1.1` 도 그대로입니다.
+- 런타임 코드·스키마 변경 없음: envelope `1.0` / last-scan payload `1.1` 은 그대로이고 scan, garden, audit 흐름도 1.6.1과 같습니다. 의도된 동작 차이는 아래의 reference 경로 하드닝 한 가지뿐입니다.
 
 ### 수정됨
 

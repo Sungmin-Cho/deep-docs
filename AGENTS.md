@@ -1,11 +1,17 @@
 # deep-docs — Agent Guide
 
 Document gardening plugin for agent-instruction files and project docs: `scan` finds drift,
-`garden` repairs it under user approval, `audit` scores it. Every deterministic operation —
-filesystem, Git, hashing, timestamps, envelope, baseline, atomic mutation — belongs to
-`scripts/deep-docs-runtime.js` and `scripts/runtime/`. Agents own semantic classification and
-approvals, nothing else. Runtime errors are visible failures; there is no direct-filesystem
-fallback.
+`garden` repairs it under user approval, `audit` scores it.
+
+Ownership is split, and the split is load-bearing. The runtime
+(`scripts/deep-docs-runtime.js` and `scripts/runtime/`) owns every guarded state transition:
+Git and filesystem inspection, hashing, timestamps, envelope construction and validation, the
+authoring baseline, and the atomic replacement of `last-scan.json`, `garden-ignored.json`, and
+any authored document. The host and its agents own semantic classification, user approval, the
+bounded request JSON handed to the runtime, and applying approved auto-fix edits to ordinary
+project documents. Neither side substitutes for the other: a runtime error is a visible failure
+with no direct-filesystem fallback, and the host never hand-writes or deletes a runtime-owned
+artifact.
 
 Supported runtime: Node.js 22 on native Windows, macOS, and Linux. Git is optional; Git Bash
 and Python are not required.

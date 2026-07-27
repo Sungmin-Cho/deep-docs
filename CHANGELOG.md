@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Agent-facing documentation consolidated so the plugin follows the AGENTS-first policy it recommends to target projects: `AGENTS.md` now holds every shared contract and `CLAUDE.md` is a thin `@AGENTS.md` wrapper with Claude Code-specific notes only.
 - Skill and agent instructions trimmed to their contracts, with conditional detail left to the existing workflow references instead of being restated.
-- No behavior change: scan, garden, and audit run exactly as in 1.6.1, and envelope `1.0` / last-scan payload `1.1` are unchanged.
+- No runtime-code or schema change: envelope `1.0` / last-scan payload `1.1` are unchanged, and the scan, garden, and audit flows are the 1.6.1 flows. The one intended behavior difference is the reference-path hardening listed below.
 
 ### Fixed
 
