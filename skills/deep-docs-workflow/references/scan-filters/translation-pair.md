@@ -2,7 +2,7 @@
 
 ## Purpose and executable source
 
-`translationGroup(relativePath)` in `scripts/runtime/scan.js` is the executable contract. `buildScanContext()` stores the result in `ScanContextV1.documents[].translation_group`.
+`translationGroup(relativePath)` in `<plugin-root>/scripts/runtime/scan.js` is the executable contract. `buildScanContext()` stores the result in `ScanContextV1.documents[].translation_group`.
 
 The group prevents exact prose shared by an intentional translation family from being proposed as an auto-fix duplicate.
 
@@ -23,13 +23,13 @@ Only documents whose computed group keys are equal are a translation family. Dir
 | `README.md` | `README` |
 | `README.ko.md` | `README` |
 | `README.EN.md` | `README` |
-| `docs/api/README.md` | `docs/api/README` |
-| `docs/setup/README.ko.md` | `docs/setup/README` |
+| `guides/api/README.md` | `guides/api/README` |
+| `guides/setup/README.ko.md` | `guides/setup/README` |
 | `config.go.md` | `config.go` |
 | `install.sh.md` | `install.sh` |
 | `README.en-US.md` | `README.en-US` |
 | `guide.fr.md` | `guide.fr` |
-| Windows-spelled `docs\\guide.ko.md` | `docs/guide` |
+| Windows-spelled `guides\\guide.ko.md` | `guides/guide` |
 
 The `config.go.md` and `install.sh.md` examples demonstrate that arbitrary two-letter or extension-like segments are not locale suffixes. The two directory examples demonstrate why basename-only grouping is forbidden.
 

@@ -17,7 +17,7 @@ tools:
 
 # Document Scanner Agent
 
-프로젝트 문서의 의미를 분류하되, 결정적 discovery·Git·timestamp·hash·envelope·atomic replacement를 다시 구현하지 않는다. 그 단일 진실원본은 `scripts/runtime/scan.js`를 사용하는 host 제공 명령 `node "<plugin-root>/scripts/deep-docs-runtime.js" ...`이다.
+프로젝트 문서의 의미를 분류하되, 결정적 discovery·Git·timestamp·hash·envelope·atomic replacement를 다시 구현하지 않는다. 그 단일 진실원본은 `<plugin-root>/scripts/runtime/scan.js`를 사용하는 host 제공 명령 `node "<plugin-root>/scripts/deep-docs-runtime.js" ...`이다.
 
 ## Capability boundary
 
@@ -130,7 +130,7 @@ The emitted envelope has this documentary shape. The runtime supplies all omitte
 }
 ```
 
-`scripts/validate-envelope-emit.js` runs inside `emit` and rejects the payload on any drift, so the summary must be exact rather than approximate: `summary.total_issues`, `auto_fixable`, and `audit_only` count `documents[].issues[]` only, while `summary.authoring` counts `gaps[]`. Gaps are never issues.
+`<plugin-root>/scripts/validate-envelope-emit.js` runs inside `emit` and rejects the payload on any drift, so the summary must be exact rather than approximate: `summary.total_issues`, `auto_fixable`, and `audit_only` count `documents[].issues[]` only, while `summary.authoring` counts `gaps[]`. Gaps are never issues.
 
 ## Result contract
 

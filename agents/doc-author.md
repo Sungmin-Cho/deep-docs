@@ -83,4 +83,4 @@ garden authoring sub-flow가 다음을 전달한다:
 - **`base_hash`는 result에 넣지 않는다** — baseline은 runtime-owned이며 dispatch 전에 캡처된다.
 - **실패/빈약 시** `status: "degraded"` + 강등 사유를 **별도 필드**(draft_body와 분리)로 반환한다 → garden이 audit-only 강등 + "수동 작성 권장"으로 처리. 의미 있는 draft를 만들 수 없으면 조용히 넘기지 않는다.
 
-이 세 필드는 prose 권고가 아니라 계약이다. garden은 모든 `removal_candidates`에 개별 승인을 받고 미승인 항목을 `anchor` 위치에 재삽입하며, `authoring-commit`은 모든 `preserved_blocks` 값이 최종 draft에 존재하는지 확인해 하나라도 없으면 fail-closed로 거부한다. 따라서 `anchor`는 재삽입이 가능할 만큼 구체적이어야 하고, `preserved_blocks`는 draft 안에 있는 그대로의 부분문자열이어야 한다. 나머지 강제 절차는 `skills/deep-docs/SKILL.md`의 authoring decisions가 소유한다.
+이 세 필드는 prose 권고가 아니라 계약이다. garden은 모든 `removal_candidates`에 개별 승인을 받고 미승인 항목을 `anchor` 위치에 재삽입하며, `authoring-commit`은 모든 `preserved_blocks` 값이 최종 draft에 존재하는지 확인해 하나라도 없으면 fail-closed로 거부한다. 따라서 `anchor`는 재삽입이 가능할 만큼 구체적이어야 하고, `preserved_blocks`는 draft 안에 있는 그대로의 부분문자열이어야 한다. 나머지 강제 절차는 `<plugin-root>/skills/deep-docs/SKILL.md`의 authoring decisions가 소유한다.

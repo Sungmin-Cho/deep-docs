@@ -6,7 +6,7 @@ user-invocable: true
 
 # deep-docs — Document Gardening
 
-에이전트 지침 문서의 건강 상태를 scan, garden, audit 합니다. 결정적 파일시스템·Git·envelope 작업의 단일 진실원본은 `scripts/deep-docs-runtime.js`와 `scripts/runtime/`입니다.
+에이전트 지침 문서의 건강 상태를 scan, garden, audit 합니다. 결정적 파일시스템·Git·envelope 작업의 단일 진실원본은 `<plugin-root>/scripts/deep-docs-runtime.js`와 `<plugin-root>/scripts/runtime/`입니다.
 
 ## Host routing (mandatory)
 

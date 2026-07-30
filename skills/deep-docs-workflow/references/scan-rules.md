@@ -1,6 +1,6 @@
 # Scan Rules — Auto-fix, Authoring, Audit-only
 
-This file fixes classification semantics. Executable discovery and reference facts come from `scripts/runtime/scan.js`; semantic evidence is gathered with scanner Read/Glob/Grep only.
+This file fixes classification semantics. Executable discovery and reference facts come from `<plugin-root>/scripts/runtime/scan.js`; semantic evidence is gathered with scanner Read/Glob/Grep only.
 
 ## Executable candidate scope
 
@@ -45,7 +45,7 @@ For a normalized dead path, call `rename-history` through the shared runtime. It
 
 ### 3. Stale example/command
 
-Use `scan-filters/cli-whitelist.md`, `ScanContextV1.package_scripts`, and repository configuration evidence. A missing exact project script with a known replacement can be auto-fixed. Unknown future/system commands, code examples without an exact replacement, and ambiguous environment variables are audit-only.
+Use `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/cli-whitelist.md`, `ScanContextV1.package_scripts`, and repository configuration evidence. A missing exact project script with a known replacement can be auto-fixed. Unknown future/system commands, code examples without an exact replacement, and ambiguous environment variables are audit-only.
 
 ### 4. Duplicate instruction
 

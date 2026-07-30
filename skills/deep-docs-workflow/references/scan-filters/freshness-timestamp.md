@@ -2,7 +2,7 @@
 
 ## Purpose and executable source
 
-The internal Node `lastModifiedEpoch(...)` path in `scripts/runtime/scan.js` is the executable contract. `buildScanContext()` records its result as `ScanContextV1.documents[].last_modified_epoch`; scanner and audit consumers must use that field rather than invoke platform-specific metadata tools.
+The internal Node `lastModifiedEpoch(...)` path in `<plugin-root>/scripts/runtime/scan.js` is the executable contract. `buildScanContext()` records its result as `ScanContextV1.documents[].last_modified_epoch`; scanner and audit consumers must use that field rather than invoke platform-specific metadata tools.
 
 ## Timestamp contract
 

@@ -1,6 +1,6 @@
 # Scan Filters
 
-이 디렉터리는 scanner가 사용하는 heuristic의 설명과 안전 불변식을 보존한다. 실행 가능한 단일 진실원본은 Node `scripts/runtime/scan.js`와 그 호출자 `scripts/deep-docs-runtime.js`다. Reference 문서는 대체 구현이 아니며 agent가 별도 스크립트로 실행해서는 안 된다.
+이 디렉터리는 scanner가 사용하는 heuristic의 설명과 안전 불변식을 보존한다. 실행 가능한 단일 진실원본은 Node `<plugin-root>/scripts/runtime/scan.js`와 그 호출자 `<plugin-root>/scripts/deep-docs-runtime.js`다. Reference 문서는 대체 구현이 아니며 agent가 별도 스크립트로 실행해서는 안 된다.
 
 ## 설계 원칙
 
@@ -14,12 +14,12 @@
 
 | Reference | Executable Node source |
 |---|---|
-| `translation-pair.md` | `translationGroup(relativePath)` |
-| `code-fence.md` | `splitNonFencedSegments(text)` |
-| `reference-extraction.md` | `extractReferences(text)` and `ScanContextV1.documents[].references` |
-| `cli-whitelist.md` | `ScanContextV1.package_scripts`, `BUILTINS_MAP`, `SYSTEM_COMMAND_WHITELIST`, optional explicit path-check flag |
-| `worktree-hash.md` | `computeWorktreeHash(root)` and its length-prefixed/NUL-safe stream |
-| `freshness-timestamp.md` | runtime `lastModifiedEpoch(...)` and `documents[].last_modified_epoch` |
+| `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/translation-pair.md` | `translationGroup(relativePath)` |
+| `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/code-fence.md` | `splitNonFencedSegments(text)` |
+| `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/reference-extraction.md` | `extractReferences(text)` and `ScanContextV1.documents[].references` |
+| `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/cli-whitelist.md` | `ScanContextV1.package_scripts`, `BUILTINS_MAP`, `SYSTEM_COMMAND_WHITELIST`, optional explicit path-check flag |
+| `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/worktree-hash.md` | `computeWorktreeHash(root)` and its length-prefixed/NUL-safe stream |
+| `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/freshness-timestamp.md` | runtime `lastModifiedEpoch(...)` and `documents[].last_modified_epoch` |
 
 ## Scan order
 

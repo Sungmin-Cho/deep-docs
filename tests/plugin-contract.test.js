@@ -82,7 +82,7 @@ test('tracked public instructions use the Node version command, not the local jq
   const texts = new Map(await Promise.all(paths.map(async (path) => [path, await readFile(path, 'utf8')])));
   const publicOperationalText = [...texts.values()].join('\n');
   assert.doesNotMatch(publicOperationalText, /\bjq\s+-r\b/);
-  const nodeVersionCommand = `node -p "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')).version"`;
+  const nodeVersionCommand = `node -p "JSON.parse(require('fs').readFileSync('<plugin-root>/.claude-plugin/plugin.json','utf8')).version"`;
   for (const guide of ['AGENTS.md', 'CLAUDE.md']) {
     assert.match(texts.get(guide), new RegExp(nodeVersionCommand.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     assert.match(texts.get(guide), /docs\/DOCS_RULE\.md/);

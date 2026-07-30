@@ -7,11 +7,11 @@ user-invocable: false
 
 # Deep Docs Workflow
 
-The normative scan/garden/audit procedure is `skills/deep-docs/SKILL.md`, which `/deep-docs` loads; read this file alongside it. This file holds the runtime boundary, the reference index, and the invariants that hold across all three subcommands.
+The normative scan/garden/audit procedure is `<plugin-root>/skills/deep-docs/SKILL.md`, which `/deep-docs` loads; read this file alongside it. This file holds the runtime boundary, the reference index, and the invariants that hold across all three subcommands.
 
 ## Runtime boundary
 
-Deterministic discovery, Git, timestamp, hash, envelope, baseline, and atomic mutation belong to `scripts/deep-docs-runtime.js` and `scripts/runtime/`. Resolve `<plugin-root>` from the loaded skill, not from the target cwd or an environment variable.
+Deterministic discovery, Git, timestamp, hash, envelope, baseline, and atomic mutation belong to `<plugin-root>/scripts/deep-docs-runtime.js` and `<plugin-root>/scripts/runtime/`. Resolve `<plugin-root>` from the loaded skill, not from the target cwd or an environment variable.
 
 `scan-context --root "<target-root>"` creates an absent state directory through the shared guarded Node path and returns `ScanContextV1`. Every other command takes a direct JSON request basename under `.deep-docs/`: `rename-history`, `reuse`, `emit`, `authoring-baseline`, `authoring-commit`, `signature`, `garden-ignore`, and `scan-invalidate`.
 

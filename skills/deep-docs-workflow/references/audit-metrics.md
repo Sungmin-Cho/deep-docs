@@ -1,6 +1,6 @@
 # Audit Metrics
 
-The metric inputs are `ScanContextV1.documents[].size_lines`, `last_modified_epoch`, `references`, and scanner-classified issue counts. Deterministic values come from `scripts/runtime/scan.js`; audit must not remeasure them with a host-specific alternative.
+The metric inputs are `ScanContextV1.documents[].size_lines`, `last_modified_epoch`, `references`, and scanner-classified issue counts. Deterministic values come from `<plugin-root>/scripts/runtime/scan.js`; audit must not remeasure them with a host-specific alternative.
 
 ## 1. Size
 
@@ -14,7 +14,7 @@ The metric inputs are `ScanContextV1.documents[].size_lines`, `last_modified_epo
 
 ## 2. Freshness (path-scoped)
 
-Use `references` and runtime-grounded epoch evidence according to `scan-filters/freshness-timestamp.md`. A reference is stale only when a valid target epoch is newer than the containing document's `last_modified_epoch`. Missing paths are excluded from this denominator and remain reference-accuracy findings.
+Use `references` and runtime-grounded epoch evidence according to `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/freshness-timestamp.md`. A reference is stale only when a valid target epoch is newer than the containing document's `last_modified_epoch`. Missing paths are excluded from this denominator and remain reference-accuracy findings.
 
 | Stale ratio | Score |
 |---|---|

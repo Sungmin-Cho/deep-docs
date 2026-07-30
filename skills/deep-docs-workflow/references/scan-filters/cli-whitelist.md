@@ -2,7 +2,7 @@
 
 ## Purpose and executable source
 
-The executable facts are `CLI_BINARIES`, `BUILTINS_MAP`, and `SYSTEM_COMMAND_WHITELIST` in `scripts/runtime/scan.js`, plus `ScanContextV1.package_scripts`. `extractReferences()` emits an inline command as one `cli` reference when its first token is in `CLI_BINARIES`.
+The executable facts are `CLI_BINARIES`, `BUILTINS_MAP`, and `SYSTEM_COMMAND_WHITELIST` in `<plugin-root>/scripts/runtime/scan.js`, plus `ScanContextV1.package_scripts`. `extractReferences()` emits an inline command as one `cli` reference when its first token is in `CLI_BINARIES`.
 
 This reference defines semantic classification over those facts. It is not an alternate parser or command runner.
 
@@ -65,5 +65,5 @@ The scanner must not read an environment toggle or silently enable this feature.
 
 - Malformed or empty values are not executed and cannot become an auto-fix.
 - Quoting is not interpreted as shell syntax; the scanner treats the extracted text as documentary content.
-- `reference-extraction.md` owns CLI-first extraction. This file owns only stale classification.
+- `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/reference-extraction.md` owns CLI-first extraction. This file owns only stale classification.
 - A stale result is emitted as `stale-example`; category is auto-fix only with an exact suggested value, otherwise audit-only.

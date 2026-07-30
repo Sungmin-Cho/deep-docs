@@ -47,7 +47,7 @@ const changelog = read('CHANGELOG.md');
 const agentsGuide = read('AGENTS.md');
 const claudeGuide = read('CLAUDE.md');
 const contributing = read('CONTRIBUTING.md');
-const nodeVersionCommand = `node -p "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')).version"`;
+const nodeVersionCommand = `node -p "JSON.parse(require('fs').readFileSync('<plugin-root>/.claude-plugin/plugin.json','utf8')).version"`;
 const publicOperationalText = [
   read('README.md'),
   read('README.ko.md'),
