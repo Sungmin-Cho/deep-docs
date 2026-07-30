@@ -4,7 +4,7 @@ Document gardening plugin for agent-instruction files and project docs: `scan` f
 `garden` repairs it under user approval, `audit` scores it.
 
 Ownership is split, and the split is load-bearing. The runtime
-(`scripts/deep-docs-runtime.js` and `scripts/runtime/`) owns every guarded state transition:
+(`<plugin-root>/scripts/deep-docs-runtime.js` and `<plugin-root>/scripts/runtime/`) owns every guarded state transition:
 Git and filesystem inspection, hashing, timestamps, envelope construction and validation, the
 authoring baseline, and the atomic replacement of `last-scan.json`, `garden-ignored.json`, and
 any authored document. The host and its agents own semantic classification, user approval, the
@@ -16,15 +16,15 @@ artifact.
 Supported runtime: Node.js 22 on native Windows, macOS, and Linux. Git is optional; Git Bash
 and Python are not required.
 
-Version: `node -p "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8')).version"` — history in `CHANGELOG.md` / `CHANGELOG.ko.md`.
+Version: `node -p "JSON.parse(require('fs').readFileSync('<plugin-root>/.claude-plugin/plugin.json','utf8')).version"` — history in `CHANGELOG.md` / `CHANGELOG.ko.md`.
 
-> 📄 Documentation in this repo follows `docs/DOCS_RULE.md` (local maintainer guide — single-source-of-truth rules for README / CHANGELOG / this file).
+> 📄 Documentation in this repo follows `docs/DOCS_RULE.md` (local maintainer guide — single-source-of-truth rules for README / CHANGELOG / this file). It is gitignored, so an installed plugin ships with nothing there: never try to open it at runtime, because the only place that path can resolve in an installed plugin is the project being analysed.
 
 ## Surfaces
 
-Dual manifests, `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` (the latter alone
-carries `skills: "./skills/"`), over one entry skill (`skills/deep-docs/SKILL.md`), one contract skill
-with its `references/` (`skills/deep-docs-workflow/`), and two agents. `agents/doc-author.md` is
+Dual manifests, `<plugin-root>/.claude-plugin/plugin.json` and `<plugin-root>/.codex-plugin/plugin.json` (the latter alone
+carries `skills: "./skills/"`), over one entry skill (`<plugin-root>/skills/deep-docs/SKILL.md`), one contract skill
+with its `references/` (`<plugin-root>/skills/deep-docs-workflow/`), and two agents. `<plugin-root>/agents/doc-author.md` is
 read/search only and must never be granted terminal, write, edit or apply-patch capability on
 any host.
 
@@ -43,11 +43,11 @@ Advertised to the suite as `.deep-docs/last-scan.json`. The identity consumers m
 - `envelope.producer` `"deep-docs"`, `envelope.artifact_kind` `"last-scan"`,
   `envelope.schema` `{ name: "last-scan", version: "1.1" }` — the payload schema version, which
   is deliberately distinct from the wrapper version
-- `envelope.producer_version` is read from `.claude-plugin/plugin.json` at emit time; never put
+- `envelope.producer_version` is read from `<plugin-root>/.claude-plugin/plugin.json` at emit time; never put
   a version literal in an agent definition
 - `payload.provenance.worktree_hash` — 40-hex SHA-1, or `"no-git"`
 
-`scripts/validate-envelope-emit.js` is the executable contract for the rest (ULID `run_id`,
+`<plugin-root>/scripts/validate-envelope-emit.js` is the executable contract for the rest (ULID `run_id`,
 RFC 3339 `generated_at`, git block, gap shape, summary cross-check). It gates every `emit` and
 runs standalone as `npm run validate:envelope`.
 
@@ -78,8 +78,8 @@ invalidates every cached artifact**, and the first `garden` or `audit` after a b
 re-scans. That is intended: a version bump can change how a payload is classified.
 
 The hash construction, its `.deep-docs` exclusion and the full edge matrix are in
-`skills/deep-docs-workflow/references/scan-filters/worktree-hash.md`; the implementation is
-`evaluateReuse` and `hashRepositoryProjection` under `scripts/runtime/`. Those two, this file,
+`<plugin-root>/skills/deep-docs-workflow/references/scan-filters/worktree-hash.md`; the implementation is
+`evaluateReuse` and `hashRepositoryProjection` under `<plugin-root>/scripts/runtime/`. Those two, this file,
 and both `SKILL.md` files change together.
 
 A reusable result is an artifact snapshot **plus** its `artifact_revision` — freeze that exact
@@ -111,14 +111,14 @@ a whole-document draft, never a substitution pair. **audit-only** — anything n
 judgement, never mutated. Anything without an exact replacement is demoted to audit-only, and
 `size-warning` is never auto-fixable because splitting a document is structural judgement
 rather than substitution. The per-rule membership, thresholds and evidence bars are in
-`skills/deep-docs-workflow/references/scan-rules.md`.
+`<plugin-root>/skills/deep-docs-workflow/references/scan-rules.md`.
 
 **Target-project doc policy (D13, AGENTS-first single source).** Shared instructions belong in
 the target's `AGENTS.md`; its `CLAUDE.md` is a thin `@AGENTS.md` wrapper carrying Claude
 Code-specific content only. Garden processes `AGENTS.md` gaps before `CLAUDE.md` gaps, and the
 import is inserted only when `AGENTS.md` already exists or was committed in the same session, so
 it never points at a rejected document. Skeletons are in
-`skills/deep-docs-workflow/references/authoring-rules/`.
+`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/`.
 
 ## Portability invariants
 
@@ -153,13 +153,14 @@ cross-platform test suite.
 
 ## Release
 
-The version literal lives in eight files: the three manifests (`.claude-plugin/plugin.json`,
-`.codex-plugin/plugin.json`, `package.json`, kept equal by `verify:fixes`), the four
-`tests/fixtures/sample-last-scan*.json` `producer_version` fields, and the `release train`
-test in `tests/plugin-contract.test.js`. Bump all eight together, add the entry to both
+The version literal lives in eight files: the three manifests (`<plugin-root>/.claude-plugin/plugin.json`,
+`<plugin-root>/.codex-plugin/plugin.json`, `package.json`, kept equal by `verify:fixes`), the four
+`<plugin-root>/tests/fixtures/sample-last-scan*.json` `producer_version` fields, and the `release train`
+test in `<plugin-root>/tests/plugin-contract.test.js`. Bump all eight together, add the entry to both
 CHANGELOG files, and keep release notes out of this file.
 
 Re-pinning the marketplace is the suite repo's job, not a hand-edit here: from
 `claude-deep-suite`, run `npm run release:bump -- deep-docs <sha40>`, which regenerates the
-docs and runs `preflight` as its own gate. It writes `.claude-plugin/marketplace.json` only —
-`.agents/plugins/marketplace.json` still needs a manual sync.
+docs and runs `preflight` as its own gate. It writes only the Claude marketplace manifest in
+that repo — the Codex mirror manifest there still needs a manual sync. Both live in
+`claude-deep-suite`, never here.

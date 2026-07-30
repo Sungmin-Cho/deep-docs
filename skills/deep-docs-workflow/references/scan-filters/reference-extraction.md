@@ -2,7 +2,7 @@
 
 ## Purpose and executable source
 
-`extractReferences(text)` in `scripts/runtime/scan.js` is the executable contract. `buildScanContext()` stores its normalized output in `ScanContextV1.documents[].references`; the scanner consumes those records rather than re-parsing documents.
+`extractReferences(text)` in `<plugin-root>/scripts/runtime/scan.js` is the executable contract. `buildScanContext()` stores its normalized output in `ScanContextV1.documents[].references`; the scanner consumes those records rather than re-parsing documents.
 
 Each record is `{ kind, value, line }`, where `kind` is `path`, `cli`, `env`, or `symbol` and `line` is the original one-based document line.
 
@@ -60,6 +60,6 @@ Path normalization uses repository-relative `/` separators. Absolute and escapin
 
 ## Integration
 
-- `cli` records use `cli-whitelist.md` and `ScanContextV1.package_scripts`.
+- `cli` records use `<plugin-root>/skills/deep-docs-workflow/references/scan-filters/cli-whitelist.md` and `ScanContextV1.package_scripts`.
 - `path` records feed existence, freshness, and optional `rename-history` evidence.
 - The scanner must not weaken these rules or restore a second parser.

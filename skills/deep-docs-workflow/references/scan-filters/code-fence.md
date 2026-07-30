@@ -2,7 +2,7 @@
 
 ## Purpose and executable source
 
-`splitNonFencedSegments(text)` in `scripts/runtime/scan.js` is the exported executable contract. `extractReferences(text)` consumes its output. Fenced content is excluded from reference extraction and each returned prose line retains its original one-based line number.
+`splitNonFencedSegments(text)` in `<plugin-root>/scripts/runtime/scan.js` is the exported executable contract. `extractReferences(text)` consumes its output. Fenced content is excluded from reference extraction and each returned prose line retains its original one-based line number.
 
 This prevents examples inside fenced blocks from becoming dead references and prevents prose on opposite sides of a fence from being concatenated into a false duplicate window.
 

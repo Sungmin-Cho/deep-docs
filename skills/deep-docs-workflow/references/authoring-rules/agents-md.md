@@ -6,7 +6,7 @@
 
 ## 역할 — 기본(primary) 관리 문서 (D13)
 
-AGENTS.md는 프로젝트 에이전트 지침의 **단일 소스**다. 런타임 공용 지침(overview/명령/컨벤션/구조/함정)은 전부 여기에 담고, CLAUDE.md는 `@AGENTS.md`를 import하는 thin wrapper로 유지한다 (`claude-md.md` / `README.md` cross-document D13 참조).
+AGENTS.md는 프로젝트 에이전트 지침의 **단일 소스**다. 런타임 공용 지침(overview/명령/컨벤션/구조/함정)은 전부 여기에 담고, CLAUDE.md는 `@AGENTS.md`를 import하는 thin wrapper로 유지한다 (`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/claude-md.md` / `README.md` cross-document D13 참조).
 
 - create/restructure 시 root CLAUDE.md가 존재하면 garden이 그 내용을 **이관 소스로 첨부**한다 — 런타임 공용 블록은 AGENTS.md draft로 흡수한다 (복사가 아닌 이동 — CLAUDE.md 쪽 제거는 이어지는 claude-md restructure가 per-removal 승인으로 처리).
 - **Claude Code 특화 내용(hooks / slash command / MCP / permissions)은 AGENTS.md에 넣지 않는다** — 다른 런타임에 무의미하고 32KiB 예산만 낭비한다. 그런 블록은 CLAUDE.md 잔류 대상이다.
@@ -38,4 +38,4 @@ overview / setup / test / style / structure / PR / security / boundaries
 
 ## mode 분기
 
-`claude-md.md`와 동일한 create / restructure 휴리스틱 (재생성 가능 → `removal_candidates`, 그 외 → `preserved_blocks` 보수적 보존).
+`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/claude-md.md`와 동일한 create / restructure 휴리스틱 (재생성 가능 → `removal_candidates`, 그 외 → `preserved_blocks` 보수적 보존).

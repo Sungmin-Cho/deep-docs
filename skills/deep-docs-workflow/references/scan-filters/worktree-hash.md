@@ -2,7 +2,7 @@
 
 ## Purpose and executable source
 
-`computeWorktreeHash(root)` and its internal streaming implementation in `scripts/runtime/scan.js` are the executable contract. `scan-context` records the result as `ScanContextV1.worktree_hash`; `emit` copies it into payload provenance and `reuse` recomputes it.
+`computeWorktreeHash(root)` and its internal streaming implementation in `<plugin-root>/scripts/runtime/scan.js` are the executable contract. `scan-context` records the result as `ScanContextV1.worktree_hash`; `emit` copies it into payload provenance and `reuse` recomputes it.
 
 The hash detects tracked, staged, and untracked source-projection changes that a HEAD-plus-TTL check would miss. `.deep-docs` state is deliberately excluded so artifact creation does not invalidate itself.
 
