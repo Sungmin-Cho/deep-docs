@@ -218,6 +218,23 @@ const ANY_ROOT = String.raw`(?:(?:${ANCHOR})${SEP}|${REL}|(?:${PLUGIN_DIRS})${SE
 // Each pattern captures the path token in group 1, so anchoring and containment
 // are judged per token rather than per line — a line mixing an anchored and a
 // bare path must still fail on the bare one.
+// Extensions are asked of the shipped index, not listed. The listed version missed
+// what the plugin actually ships: deep-wiki ships a `.py`, and all three ship a
+// `.yml` that no list held. A new file type added tomorrow joins these sets by
+// existing, which is the point.
+const SHIPPED_EXTS = [...new Set([...PLUGIN_FILES]
+  .map((k) => (k.match(/\.([A-Za-z0-9]+)$/) || [])[1]).filter(Boolean))].sort();
+// For "is this token an instruction to RUN something", the list is INVERTED. Naming
+// the executable extensions is fail-open — the extension nobody thought of is
+// silently inert. Naming the inert ones is fail-closed: an unfamiliar extension is
+// treated as runnable and gets flagged, and the cost of being wrong is a review
+// conversation instead of a miss.
+const INERT_EXTS = new Set(['md', 'json', 'jsonl', 'yaml', 'yml', 'txt', 'lock',
+  'png', 'svg', 'gif', 'ico', 'csv', 'gitkeep', 'gitignore', 'gitattributes']);
+const EXEC_EXTS = SHIPPED_EXTS.filter((e) => !INERT_EXTS.has(e));
+const RESOLVABLE_EXT = SHIPPED_EXTS.join('|');
+const EXECUTABLE_EXT = EXEC_EXTS.join('|');
+
 const FORMS = [
   // 1. interpreter exec: `node X`, `bash X`, `sh X`, `python X`
   ['interpreter-exec', new RegExp(String.raw`\b(?:bash|sh|zsh|node|python3?)\s+["'\`]?(${ANY_ROOT}${PATH_BODY})`, 'g')],
@@ -229,7 +246,7 @@ const FORMS = [
   // 4. executable path token anywhere.
   //    The trailing boundary matters: without it `.js` matches the prefix of
   //    `plugin.json` and the guard reports a file that does not exist.
-  ['executable-token', new RegExp(String.raw`${NOT_MID_TOKEN}((?:${ANCHOR})${SEP}|${REL}|(?:${PLUGIN_DIRS})${SEP})([A-Za-z0-9._/\\-]*\.(?:js|sh|mjs|cjs)(?![A-Za-z0-9]))`, 'g')],
+  ['executable-token', new RegExp(String.raw`${NOT_MID_TOKEN}((?:${ANCHOR})${SEP}|${REL}|(?:${PLUGIN_DIRS})${SEP})([A-Za-z0-9._/\\-]*\.(?:${EXECUTABLE_EXT})(?![A-Za-z0-9]))`, 'g')],
 ];
 
 // DENY BY DEFAULT.
@@ -428,7 +445,7 @@ function bareBasenameHits(line) {
 // `${CLAUDE_PLUGIN_ROOT}/…` and `$ANY_OTHER_ROOT/…` without naming either.
 // `EXPANDED_ANCHOR` is the narrower companion for the anchor itself, which must
 // be wrong even with no path after it.
-const VARIABLE_ROOT = /\$\{?[A-Za-z_][A-Za-z0-9_]*\}?[\\/]/;
+const VARIABLE_ROOT = /\$\{?[A-Za-z_][A-Za-z0-9_]*\}?[\\/]|%[A-Za-z_][A-Za-z0-9_]*%[\\/]/;
 const EXPANDED_ANCHOR = /\$\{?(?:PLUGIN_ROOT|[A-Za-z_][A-Za-z0-9_]*_PLUGIN_ROOT|plugin-root)\b/;
 
 // JS MODULE LOAD — refused outright, in every spelling.
@@ -1111,7 +1128,7 @@ test('no undeclared path under a maintainer-only directory is named', () => {
   // `**docs/X.md**` and `[docs/Y.md](…)` are ordinary markdown and slip past a
   // space/backtick/quote/paren list.
   const escaped = MAINTAINER_ONLY_DIRS.map((d) => d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  const re = new RegExp(String.raw`(?<![A-Za-z0-9._\\/-])((?:${escaped})[\\/][A-Za-z0-9._\\/-]+)`, 'g');
+  const re = new RegExp(String.raw`(?<![A-Za-z0-9._\\/-])(?:\.[\\/])?((?:${escaped})[\\/][A-Za-z0-9._\\/-]+)`, 'g');
 
   for (const probe of ['See `docs/backlog.md` for the rest.', 'See `docs\\backlog.md` too.',
     '**docs/bold.md** matters', '[docs/link.md](x) matters']) {
@@ -1206,9 +1223,14 @@ test('a backslash separator does not hide a path from the guard', () => {
   // does not exist, so this rule is the only one that can see it. It carries its
   // own inline copy of the root and body patterns, so the other FORMS learning
   // `\` teaches it nothing.
+  // The second case used `.sh`, which this plugin does not ship — so once the
+  // extension set was derived from the index instead of listed, the case stopped
+  // being a case. Both spellings must use an extension that is actually runnable
+  // here, or the FORM's coverage claim rests on a token it would never see.
+  assert.ok(EXEC_EXTS.includes('js'), 'the cases below assume `.js` is runnable here');
   for (const line of [
     'the generator is at `scripts\\runtime\\missing-generator.js`',
-    'the helper `scripts\\missing-helper.sh` is invoked at Stop',
+    'the helper `scripts\\missing-helper.js` is invoked at Stop',
   ]) {
     const hits = shadowableTokens(line);
     assert.deepEqual(hits.map((h) => h.form), ['executable-token'],
@@ -1326,6 +1348,15 @@ test('the anchor cannot be spelled as a shell variable anywhere', () => {
     'the expanded-root rule must reject the shell spelling regardless of the command');
   assert.ok(VARIABLE_ROOT.test('node "${CLAUDE_PLUGIN_ROOT}/scripts/deep-docs-runtime.js"'),
     "and a sibling repo's anchor spelling, which nothing here substitutes either");
+  // Each arm of VARIABLE_ROOT gets its own case. Review measured that narrowing the
+  // pattern to braces only turned no test red: the bare-`$VAR` arm worked and could
+  // have been deleted in any tidy-up with the suite still green.
+  assert.ok(VARIABLE_ROOT.test('node $DOCS_HOME/scripts/deep-docs-runtime.js'),
+    'and a bare $VAR root, named by nothing in this rule');
+  // AGENTS.md:16 commits this plugin to native Windows without Git Bash, so cmd.exe
+  // expansion is a live spelling here, not a curiosity.
+  assert.ok(VARIABLE_ROOT.test('node "%CLAUDE_PLUGIN_ROOT%\\scripts\\deep-docs-runtime.js"'),
+    'and the cmd.exe spelling, on a runtime this plugin supports natively');
   assert.ok(EXPANDED_ANCHOR.test('export $DEEP_DOCS_PLUGIN_ROOT'),
     'the bare `$` spelling counts even with no path after it');
   // Negatives: the shapes this repo legitimately writes must stay clean, or the
@@ -1421,7 +1452,7 @@ test('every referenced plugin path resolves inside the root', () => {
   const patterns = [
     // Trailing boundary, same reason as the guard: without it `.js` matches the
     // prefix of `.json` and the resolver reports files that never existed.
-    [new RegExp(String.raw`${ANCHOR}[\\/]([A-Za-z0-9._\\/-]+\.(?:md|js|sh|json|yaml)(?![A-Za-z0-9]))`, 'g'), false],
+    [new RegExp(String.raw`${ANCHOR}[\\/]([A-Za-z0-9._\\/-]+\.(?:${RESOLVABLE_EXT})(?![A-Za-z0-9]))`, 'g'), false],
     [/`(\.\.[\\/][A-Za-z0-9._\\/-]+\.md)(?:#[a-z0-9-]+)?`/g, true],
     [/\]\((\.\.?[\\/][A-Za-z0-9._\\/-]+\.md)\)/g, true],
   ];
