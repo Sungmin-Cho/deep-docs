@@ -82,7 +82,7 @@ The scanner classifies every finding into one of three categories.
 | Rule–code contradiction | Doc says "use snake_case" but most code uses camelCase | Architecture judgment; high false-positive risk |
 | Coverage gaps | Major modules not mentioned anywhere in docs | "Major" is subjective |
 | Map vs manual ratio | Ratio of direct instructions to external pointers | Optimal ratio varies per project |
-| Over-constrained instructions | Absolute style rules (comment density, naming, formatting) or "always do Y before X" sequencing, in `CLAUDE.md`/`AGENTS.md` only | A judgement-oriented rewrite is authorial work, not an exact substitution; safety, security, data-loss, contract, and licence absolutes are never reported |
+| Over-constrained instructions | Absolute style rules (comment density, naming, formatting) or "always do Y before X" sequencing, in `CLAUDE.md`/`AGENTS.md` only | A judgement-oriented rewrite is authorial work, not an exact substitution; absolutes covering security, credentials, data loss, destructive operations, external contracts, protocol or schema compatibility, or licensing are never reported |
 | Self-discoverable content | Blocks that restate `package.json` scripts or the directory tree with no "why" or "which one" attached, in `CLAUDE.md`/`AGENTS.md` only | Removing a passage is authorial judgement; human-facing docs legitimately restate this |
 
 ### Authoring (created/restructured by `garden`)

@@ -86,11 +86,11 @@ Absolutes covering security, credentials, data loss, destructive operations, ext
 
 ### 11. Self-discoverable content
 
-Emitted as issue `type` `self-discoverable`.
+Emitted as issue `type` `self-discoverable`. Findings carry severity `low`.
 
 The same document scope as Rule 10 applies: `CLAUDE.md` and `AGENTS.md` only.
 
-Report a block only when it restates a fact the runtime already holds — `ScanContextV1.package_scripts`, or the directory tree reachable by Glob — and carries no judgement information. A listing that says which option to choose, or why, is retained. Stated as one test: keep it when a "why" or a "which one" is attached.
+Report a block only when it restates a fact the runtime already holds — `ScanContextV1.package_scripts`, a build manifest's declared dependencies, or the directory tree reachable by Glob — and carries no judgement information. A listing that says which option to choose, or why, is retained. Stated as one test: keep it when a "why" or a "which one" is attached.
 
 The judged unit is a heading together with the fenced block it introduces, and the evidence is the prose outside that fence. Fence contents are not parsed as individual references, so the existing fenced/indented exclusion is unchanged. A heading followed only by a fence is reported; a fence whose surrounding prose says which command to use, or why, is not.
 

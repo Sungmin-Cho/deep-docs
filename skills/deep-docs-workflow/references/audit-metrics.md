@@ -58,7 +58,7 @@ Report three values per document.
 
 - The `over-constraint` count.
 - The `self-discoverable` count.
-- A progressive-disclosure observation, emitted only when the same document also carries a `size-warning`. For such a document, restate metric 5's external-pointer proportion as the room available to split the document into a tree of files loaded on demand, which is the remedy a long instruction document needs. Omit this observation entirely for a document under the warning boundary — asking a thirty-line `CLAUDE.md` for a higher pointer proportion is meaningless.
+- A progressive-disclosure observation, emitted only when the same document also carries a `size-warning`. For such a document, report metric 5's external-pointer proportion as the share of disclosure already pushed out to pointers, and its remainder as the room still available to split the document into a tree of files loaded on demand, which is the remedy a long instruction document needs. Omit this observation entirely for a document under the warning boundary — asking a thirty-line `CLAUDE.md` for a higher pointer proportion is meaningless.
 
 Introduce no new threshold. The gate is the existing size-warning boundary for these two file kinds, `>100`. The `README.md` `>300` and other-docs `>200` boundaries are unrelated to this metric and stay as they are.
 
