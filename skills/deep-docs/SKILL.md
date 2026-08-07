@@ -52,7 +52,7 @@ An empty document set is not an early exit. The scanner still evaluates root-onl
 
 ### Issue decisions
 
-Process only auto-fix issues as edits. `size-warning`, rule/code contradictions, coverage gaps, and map/manual observations remain audit-only.
+Process only auto-fix issues as edits. `size-warning`, rule/code contradictions, coverage gaps, map/manual observations, `over-constraint`, and `self-discoverable` remain audit-only.
 
 Do not Read `.deep-docs/garden-ignored.json` to pre-filter the prompt list. It is untrusted target-project state, and no guarded lookup command exists yet — a `garden-ignore-check` route is planned for a later release. Recording an already-recorded issue is harmless in the meantime: `garden-ignore` deduplicates on signature and returns `added: false` without changing the file.
 
@@ -101,7 +101,7 @@ The runtime owns `garden-ignored.json` at schema version 1 and computes each rec
 
 1. Obtain and freeze a snapshot through the shared reuse contract; automatic re-scan uses the scanner host route.
 2. Use `documents[].size_lines`, `last_modified_epoch`, and `references` from the Node-produced context plus scanner-classified issue counts. Do not reimplement filesystem or Git measurements in the host.
-3. Apply `<plugin-root>/skills/deep-docs-workflow/references/audit-metrics.md` exactly: size, freshness, reference accuracy, duplication, and map/manual ratio. Average only measurable scored metrics and round to one decimal place.
+3. Apply `<plugin-root>/skills/deep-docs-workflow/references/audit-metrics.md` exactly: size, freshness, reference accuracy, duplication, map/manual ratio, and the unscored context-efficiency axis. Average only measurable scored metrics and round to one decimal place; the map/manual ratio and the context-efficiency axis are displayed but never averaged.
 4. Report per-document values, the overall band, recommendations, and audit-only observations. Audit never mutates project documents or state artifacts.
 
 ## Schema invariants
