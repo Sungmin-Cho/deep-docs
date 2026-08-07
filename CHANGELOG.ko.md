@@ -11,7 +11,7 @@
 
 ### 추가됨
 
-- **Claude 5 컨텍스트 엔지니어링을 위한 audit-only 스캔 규칙 두 개 (D14)**. `CLAUDE.md`와 `AGENTS.md`에만 적용됩니다. `over-constraint`는 스타일 영역의 절대 규칙과, prose로는 보장되지 않는 "항상 X 전에 Y" 류 행동 강제를 보고합니다. `self-discoverable`은 `package.json` scripts나 디렉터리 트리를 "왜"·"어느 것" 없이 되풀이하는 블록을 보고합니다. 둘 다 auto-fix로 승격되지 않으며 `suggested_value`를 싣지 않습니다. 보안·자격증명·데이터 손실·외부 계약·라이선스 영역의 절대 표현은 적발하지 않습니다.
+- **Claude 5 컨텍스트 엔지니어링을 위한 audit-only 스캔 규칙 두 개 (D14)**. `CLAUDE.md`와 `AGENTS.md`에만 적용됩니다. `over-constraint`는 스타일 영역의 절대 규칙과, prose로는 보장되지 않는 "항상 X 전에 Y" 류 행동 강제를 보고합니다. `self-discoverable`은 `package.json` scripts나 디렉터리 트리를 "왜"·"어느 것" 없이 되풀이하는 블록을 보고합니다. 둘 다 auto-fix로 승격되지 않으며 `suggested_value`를 싣지 않습니다. 보안·자격증명·데이터 손실·파괴적 작업·외부 계약·프로토콜/스키마 호환·라이선스 영역의 절대 표현은 적발하지 않습니다.
 - **`audit`의 컨텍스트 효율 관측.** 같은 두 문서 종류에 대해 위 두 발견 수를 표시하고, 크기 경고에도 걸린 문서에 한해 progressive disclosure 여지를 함께 보여줍니다. 표시만 되고 점수화·평균 편입되지 않으므로 전체 점수는 움직이지 않습니다.
 
 ### 변경됨

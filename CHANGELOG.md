@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Two audit-only scan rules for Claude 5 context engineering (D14)**, on `CLAUDE.md` and `AGENTS.md` only. `over-constraint` reports absolute style rules and "always do Y before X" sequencing that prose cannot guarantee; `self-discoverable` reports blocks restating `package.json` scripts or the directory tree with no "why" or "which one" attached. Neither is ever auto-fixable and neither carries a `suggested_value`. Absolutes covering security, credentials, data loss, external contracts, and licensing are never reported.
+- **Two audit-only scan rules for Claude 5 context engineering (D14)**, on `CLAUDE.md` and `AGENTS.md` only. `over-constraint` reports absolute style rules and "always do Y before X" sequencing that prose cannot guarantee; `self-discoverable` reports blocks restating `package.json` scripts or the directory tree with no "why" or "which one" attached. Neither is ever auto-fixable and neither carries a `suggested_value`. Absolutes covering security, credentials, data loss, destructive operations, external contracts, protocol or schema compatibility, and licensing are never reported.
 - **A context-efficiency view in `audit`** for the same two file kinds — the two new counts, plus, only for a document that also triggers a size warning, how much room it has for progressive disclosure. Displayed, never scored, excluded from the average, so overall scores do not move.
 
 ### Changed
