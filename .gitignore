@@ -4,6 +4,7 @@
 # Author-local artifacts — must never reach the remote
 .deep-review/
 docs/
+.superpowers/
 
 # Editor/OS artifacts
 .DS_Store
