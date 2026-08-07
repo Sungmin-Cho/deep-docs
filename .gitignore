@@ -5,6 +5,7 @@
 .deep-review/
 docs/
 .superpowers/
+.claude/
 
 # Editor/OS artifacts
 .DS_Store
