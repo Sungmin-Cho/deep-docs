@@ -32,6 +32,8 @@ Every admitted document is rechecked as a regular non-symlink file before readin
 | 7 coverage gap | semantic inference | audit-only and Rule 9 input |
 | 8 map/manual ratio | semantic inference | audit-only |
 | 9 missing/thin document | root-only authoring guards | authoring |
+| 10 over-constrained instruction | semantic inference | audit-only |
+| 11 self-discoverable content | semantic inference | audit-only |
 
 ## Auto-fix rules
 
@@ -69,6 +71,35 @@ Report important modules not represented in documentation. Retain `uncovered_mod
 
 Report direct-instruction versus external-pointer proportions without a target score.
 
+### 10. Over-constrained instruction
+
+Emitted as issue `type` `over-constraint`.
+
+Applies only to `CLAUDE.md` and `AGENTS.md`, at the root and nested. `README.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, and Markdown under `docs/` are human-facing and are never candidates for this rule.
+
+Two evidence families qualify.
+
+- **Style absolutes**, severity low. An absolute imperative — never, always, 절대, 반드시, 금지 — applied to comment density, naming, formatting, documentation length, or code length, where model judgement is the better mechanism. The recommendation is a judgement-oriented rewrite.
+- **Behavioural sequencing**, severity medium. An "always do Y before X" rule. Prose does not guarantee it and harness-level enforcement does, so severity is higher: the instruction is not merely excessive, it is unreliable. State the recommendation host-neutrally as harness-level enforcement; Claude Code's mechanism is a PreToolUse hook, which is a Claude Code-specific concept and must not be prescribed inside an `AGENTS.md` finding.
+
+Absolutes covering security, credentials, data loss, destructive operations, external contracts, protocol or schema compatibility, and licensing are legitimate and are never reported. Report nothing when the area is unclear. The failure this rule must avoid is recommending that a genuine safety rule be relaxed, not missing an over-constrained sentence.
+
+### 11. Self-discoverable content
+
+Emitted as issue `type` `self-discoverable`. Findings carry severity `low`.
+
+The same document scope as Rule 10 applies: `CLAUDE.md` and `AGENTS.md` only.
+
+Report a block only when it restates a fact the runtime already holds — `ScanContextV1.package_scripts`, a build manifest's declared dependencies, or the directory tree reachable by Glob — and carries no judgement information. A listing that says which option to choose, or why, is retained. Stated as one test: keep it when a "why" or a "which one" is attached.
+
+The judged unit is the section a heading opens — from that heading to the line before the next heading of any level — and the evidence is that section's prose outside any fence it contains. Fence contents are not parsed as individual references, so the existing fenced/indented exclusion is unchanged. A section is reported when its only substantive content is a fence and its prose carries no judgement information; a section is retained when prose anywhere in it, before or after the fence, says which command to use or why.
+
+### Common issue fields for rules 10 and 11
+
+Neither rule is ever auto-fixable. A judgement-oriented rewrite and the removal of a self-discoverable passage are both authorial work rather than an exact substitution, exactly as splitting a document is for `size-warning`. Emit no `suggested_value` on either type.
+
+Fix `line` to the first line of the reported span and `current_value` to the verbatim excerpt of that span, so a repeated scan of an unchanged document reports the same position and excerpt.
+
 ## Authoring rule
 
 ### 9. Missing/thin root document
@@ -78,7 +109,7 @@ Only root `CLAUDE.md`, `AGENTS.md`, and `ARCHITECTURE.md` qualify. The default m
 - Missing AGENTS requires a recognized build manifest and a source directory, or an existing root `CLAUDE.md` (whose shared content becomes the migration source, stated in the rationale); severity medium.
 - Missing CLAUDE requires both a recognized build manifest and a source directory; severity medium. The create skeleton is the thin wrapper when `AGENTS.md` exists or a missing-doc AGENTS gap is emitted in the same scan, otherwise the standalone full skeleton.
 - Missing ARCHITECTURE requires approximately 10k or more source lines; severity high.
-- Thin documents are conservative: required-section deficit meets the authoring-rule threshold or Rule 7's `uncovered_modules[] / total_modules` meets its threshold; severity low to medium. Additionally, a root `CLAUDE.md` that lacks the `@AGENTS.md` import while carrying shared runtime instructions is a thin-doc restructure candidate (D13 wrapper deficit) when `AGENTS.md` exists or a missing-doc AGENTS gap is emitted in the same scan; the evidence states the missing import.
+- Thin documents are conservative, and the qualifying evidence now depends on the doc kind. For `architecture-md`, a required-section deficit meeting the authoring-rule threshold still qualifies, because its skeleton is unchanged and structure is that document's purpose; Rule 7's `uncovered_modules[] / total_modules` path meeting its threshold still qualifies there too, unchanged from before this release. For `claude-md` and `agents-md`, whose skeletons make sections optional under authoring-rules D14, a missing section is not by itself a thin-doc reason and only Rule 7's `uncovered_modules[] / total_modules` meeting its threshold qualifies. Severity low to medium. Additionally, a root `CLAUDE.md` that lacks the `@AGENTS.md` import while carrying shared runtime instructions is a thin-doc restructure candidate (D13 wrapper deficit) when `AGENTS.md` exists or a missing-doc AGENTS gap is emitted in the same scan; the evidence states the missing import.
 - A Git-ignored target is excluded. Monorepo package-local targets are deferred to v2.
 - `missing-doc` requires `exists: false` and `mode: "create"`.
 - `thin-doc` requires `exists: true` and `mode: "restructure"`.

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] — 2026-08-07
+
+### Added
+
+- **Two audit-only scan rules for Claude 5 context engineering (D14)**, on `CLAUDE.md` and `AGENTS.md` only. `over-constraint` reports absolute style rules and "always do Y before X" sequencing that prose cannot guarantee; `self-discoverable` reports blocks restating `package.json` scripts or the directory tree with no "why" or "which one" attached. Neither is ever auto-fixable and neither carries a `suggested_value`. Absolutes covering security, credentials, data loss, destructive operations, external contracts, protocol or schema compatibility, and licensing are never reported.
+- **A context-efficiency view in `audit`** for the same two file kinds — the two new counts, plus, only for a document that also triggers a size warning, how much room it has for progressive disclosure. Displayed, never scored, excluded from the average, so overall scores do not move.
+
+### Changed
+
+- The `CLAUDE.md` standalone skeleton is now gotcha-first and section-optional; tech stack and directory-structure sections are no longer prescribed, and commands are recorded only when the choice is ambiguous, with the reason.
+- **Thin-doc detection now depends on the doc kind.** For `CLAUDE.md` and `AGENTS.md` a missing section alone is no longer a thin doc, since sections became optional; module-coverage and the `@AGENTS.md` wrapper deficit remain. `ARCHITECTURE.md` detection is unchanged.
+- **Intended data change, schema unchanged.** `summary.audit_only` and `summary.total_issues` rise by whatever the new rules find, and `payload.gaps[]` evidence shifts with the thin-doc change. Envelope `1.0` and last-scan payload `1.1` are untouched, so downstream consumers need no migration.
+
 ## [1.6.2] — 2026-07-27
 
 ### Changed

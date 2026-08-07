@@ -82,6 +82,13 @@ Runtime CommonMark segments 안에서만 exact 3-line windows를 비교한다. S
 
 크기/구성, rule-code contradiction, coverage gap, map/manual ratio는 모두 audit-only다. Scanner는 false-positive 가능성이 있는 추론을 auto-fix로 승격하지 않는다.
 
+`over-constraint`(Rule 10)와 `self-discoverable`(Rule 11)도 같은 Step에서 판정하며 역시 audit-only다. 두 규칙은 `CLAUDE.md`와 `AGENTS.md`에만 적용한다 — `README.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, `docs/` 이하는 사람 대상 문서이므로 후보가 아니다.
+
+- Rule 10: 스타일·장황함 영역의 절대 규칙(severity low)과 "항상 X 전에 Y" 류 행동 강제(severity medium). 후자의 권고는 **호스트 중립**으로 쓴다 — harness 수준 강제라고만 진술하고, Claude Code 전용 개념인 PreToolUse hook을 `AGENTS.md` finding 안에 처방하지 않는다. 보안·자격증명·데이터 손실·파괴적 작업·외부 계약·**프로토콜/스키마 호환**·라이선스 영역의 절대 표현은 정당하므로 적발하지 않는다. **애매하면 적발하지 않는다** — 이 규칙이 피해야 할 실패는 놓친 과잉 제약이 아니라 정당한 안전 규칙의 완화 권고다.
+- Rule 11: 매니페스트나 디렉터리 트리에서 1:1로 도출되는 나열에 판단 정보("왜" 또는 "어느 것")가 하나도 붙어 있지 않을 때만 적발한다. 판정 단위는 heading과 그것이 도입하는 fence를 묶은 구간이고, 근거는 **fence 밖 prose**다. fence 내부 문자열을 개별 reference로 해석하지 않으므로 기존 fence 제외 관행은 그대로다.
+
+두 규칙의 정확한 증거 기준선은 `<plugin-root>/skills/deep-docs-workflow/references/scan-rules.md`의 Rule 10·11이 소유한다.
+
 ### 7. Auto-fix categories
 
 다음만 `payload.documents[].issues[]`의 auto-fix 후보가 될 수 있다.
@@ -92,6 +99,8 @@ Runtime CommonMark segments 안에서만 exact 3-line windows를 비교한다. S
 - `duplicate-block`: translation family 밖의 100% 동일 블록.
 
 모든 issue는 `type`, `category`, `severity`, `line`, `current_value`, `suggested_value`, `evidence`를 schema에 맞게 제공한다. 정확한 `suggested_value`가 없으면 audit-only로 강등한다.
+
+`over-constraint`와 `self-discoverable`은 강등이 아니라 **정의상** audit-only이므로 `suggested_value`를 싣지 않는다. 두 type의 `line`은 적발 구간의 첫 줄, `current_value`는 그 구간의 원문 발췌로 고정한다 — 변경 없는 문서를 다시 스캔했을 때 같은 위치와 발췌가 나와야 한다.
 
 ### 8. Coverage reuse
 

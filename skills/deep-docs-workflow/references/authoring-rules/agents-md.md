@@ -24,6 +24,10 @@ AGENTS.md는 프로젝트 에이전트 지침의 **단일 소스**다. 런타임
 overview / setup / test / style / structure / PR / security / boundaries
 ```
 
+이 목록은 agents.md 표준의 인용이며 자유 형식이다 — **섹션은 선택이고 gotcha가 우선이다.** 채울 내용이 없는 섹션을 자명한 정보로 메우지 않는다.
+
+의도된 트레이드오프를 남긴다: 표준 목록의 `setup` / `test` / `structure`는 명령 나열과 디렉터리 서술을 유도하므로 Rule 11(`self-discoverable`) 적발 대상을 계속 만들 수 있다. 외부 표준을 임의로 재작성하지 않는다는 판단이 이 잔여 모순보다 우선한다 — 결함이 아니라 결정이다.
+
 ## 복사 금지 / 회피
 
 - **README 내용 복사 금지** — Codex는 README를 **자동으로 읽지 않으므로** 복사는 32KiB 바이트 예산만 낭비한다.
@@ -35,6 +39,7 @@ overview / setup / test / style / structure / PR / security / boundaries
 - `~/.codex/AGENTS.md` (글로벌) + `.git` 루트 ~ CWD walk, root→cwd concatenate (가까운 게 우선).
 - `AGENTS.override.md`가 같은 레벨의 `AGENTS.md`를 대체.
 - **모노레포 중첩 분산**: 루트 AGENTS.md는 공통만, 패키지별 세부는 하위 AGENTS.md로 분산 (32KiB 누적 예산 관리).
+- **progressive disclosure**: 지침이 길어지면 한 문서를 늘리지 말고 트리로 나누는 편이 낫다. 단 doc-author는 파일을 만들거나 옮길 수 없으므로(`Read, Glob, Grep` 전용, root-only allowlist), draft에는 **이미 존재하는 문서로의 포인터만** 넣고 분할 자체는 사용자 권장으로만 남긴다.
 
 ## mode 분기
 

@@ -46,13 +46,13 @@ garden authoring sub-flow가 다음을 전달한다:
 ### 2. 코드베이스 분석 (Glob / Grep / Read)
 
 - **디렉터리 구조**: Glob으로 최상위 디렉터리/모듈 파악.
-- **빌드/테스트/린트 명령**: 빌드 매니페스트(`package.json` scripts, `Makefile` targets, `Cargo.toml`, `pyproject.toml`, `go.mod` 등)를 **Read로 파싱**해 명령을 추출한다 (추측 금지 — 매니페스트에 실제 있는 것만).
+- **빌드/테스트/린트 명령**: 빌드 매니페스트(`package.json` scripts, `Makefile` targets, `Cargo.toml`, `pyproject.toml`, `go.mod` 등)를 **Read로 파싱**한다. 파싱은 **모호성 판단용**이다 — 문서에 수록하는 것은 선택이 모호한 명령만이며, 왜 그것인지를 함께 쓴다(D14). 매니페스트에 하나뿐이라 모호하지 않은 명령은 수록하지 않는다: Claude가 매니페스트에서 그대로 읽는다. 추측은 여전히 금지 — 매니페스트에 실제 있는 것만 다룬다.
 - **린터 설정**: `.eslintrc*`, `ruff.toml`, `.prettierrc*` 등 Read.
 - **architecture-md**: 최상위 모듈/레이어/진입점/의존 관계를 "국가 지도" 수준으로 파악 (Codemap = 모듈 역할 1~2문장, 파일 목록 아님). 직접 파일/라인 링크는 금지(stale 위험) — 심볼명으로 검색 유도.
 
 ### 3. mode 분기
 
-- **`create`**: 공식 골격(`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함, 자명한 관행·linter 강제 스타일·파일별 설명은 제외.
+- **`create`**: 공식 골격(`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함하고, 자명한 관행·linter 강제 스타일·파일별 설명은 제외한다. D14에 따라 `claude-md`·`agents-md`에서는 두 가지를 추가로 만들지 않는다: 매니페스트나 디렉터리 트리에서 그대로 읽히는 서술(tech stack 나열, 디렉터리 나열, 모호하지 않은 명령 나열)과, 스타일·장황함 영역의 절대 규칙. 후자는 판단 위임형 문장으로 쓴다. **`architecture-md`는 이 금지의 대상이 아니다** — 모듈·레이어 서술이 그 문서의 목적이고 Rule 11의 적용 범위도 `CLAUDE.md`·`AGENTS.md` 한정이다.
 - **`restructure`**: 기존 문서 파싱 → 고유 콘텐츠 식별 → 골격 재배치 + 누락 섹션 보강, 고유 콘텐츠 보존.
   - **"재생성 가능"(→ `removal_candidates`)** = 코드/빌드설정/공식 규칙에서 **직접 도출 가능한** 문장만.
   - **그 외 전부 `preserved_blocks`로 기본 보존(보수적 편향)** — 애매하면 보존(default-keep).
@@ -63,7 +63,7 @@ garden authoring sub-flow가 다음을 전달한다:
 - **AGENTS.md 우선 단일 소스 (D13)**: 공용 지침은 AGENTS.md에 두고, CLAUDE.md는 첫 줄 `@AGENTS.md` import + Claude Code 특화 내용만 남는 **thin wrapper**로 작성한다. import 역시 AGENTS.md가 존재/세션 확정된 경우에만 삽입하고, 아니면 CLAUDE.md 단독 full 골격 fallback을 쓴다. `agents-md` 작업에 이관 소스(기존 CLAUDE.md)가 첨부되면 런타임 공용 블록을 draft로 흡수하고, Claude 특화 블록은 넣지 않는다. 심볼릭 링크 공존은 사용하지 않는다.
 - **길이 가드(soft 목표)**: CLAUDE thin wrapper ≤30줄 / 단독 fallback ≤100줄(hard ceiling 200, 초과는 size-warning 비차단) / AGENTS ≤100줄 + ≤32KiB 근사(영문 ~60B/줄 기준 32KiB≈540줄; 한글/긴 줄은 보수적 하향) / ARCHITECTURE 100~300줄. **줄 수에는 hard fail 없음** — 과압축으로 정보를 잃지 않는다. AGENTS 32KiB의 **정확한** byte 차단은 승인된 `authoring-commit`이 수행한다(doc-author의 byte는 heuristic).
 - **gitignore 가드**: `.gitignore`로 ignored된 경로(특히 `docs/`)에는 생성을 제안하지 않는다 (scan-side 가드와 대칭).
-- **hook 회피 원칙(D8)**: "항상 X 전에 Y" 류 강제 규칙은 prose로 작성 금지 — 필요 시 PreToolUse hook을 권하는 한 줄만.
+- **hook 회피 원칙(D8)**: "항상 X 전에 Y" 류 강제 규칙은 prose로 작성 금지 — 필요 시 **harness 수준 강제**를 권하는 한 줄만. `claude-md`에는 그 수단으로 PreToolUse hook을 명시해도 된다. **`agents-md`에는 호스트 중립으로 쓴다(D13)** — PreToolUse hook은 Claude Code 전용 개념이므로 AGENTS.md에 넣지 않는다.
 
 ### 5. 산출 — 구조화 result 객체 반환
 

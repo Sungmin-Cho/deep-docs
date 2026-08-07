@@ -15,6 +15,9 @@
 - **출처 주석**: 각 규칙 파일은 상단에 공식 출처 URL을 주석으로 명시한다 (생성 로직의 근거 + 버전 관리).
 - **길이 자가검사**: 각 문서 종류의 길이 목표(soft)와 차단선(hard)을 doc-author가 draft 산출 시 자가검사한다. 줄 수 초과는 비차단 size-warning, AGENTS 32KiB만 hard fail (garden이 Write 직전 정확 강제).
 - **default-keep**: restructure 시 애매한 콘텐츠는 보존한다. "재생성 가능"만 `removal_candidates`로, 그 외는 `preserved_blocks`로 보수적 분류.
+- **판단 우선 (D14)**: 생성 시 두 가지를 만들지 않는다 — 매니페스트나 디렉터리 트리에서 그대로 읽히는 서술과, 스타일·장황함 영역의 절대 규칙. `scan-rules.md`의 Rule 10·11이 탐지하는 것과 같은 기준이며, 보고와 생성이 같은 기준을 쓰게 하는 것이 이 결정의 목적이다.
+  - 따라서 `claude-md`와 `agents-md`의 골격에서 **섹션은 선택**이다. 채울 내용이 없는 섹션을 자명한 정보로 메우는 것이 위 두 금지에 정면으로 걸리기 때문이다. `architecture-md`는 구조 자체가 문서의 목적이므로 여기서 제외한다.
+  - 이 섹션 선택화가 `scan-rules.md` Rule 9의 thin-doc doc-kind 분기가 근거로 인용하는 바로 그 사실이다 — 그쪽 문장이 "authoring-rules D14"를 가리키므로 이 항목이 그 내용을 실제로 담아야 한다.
 
 ## cross-document 연결 규칙 (D9)
 

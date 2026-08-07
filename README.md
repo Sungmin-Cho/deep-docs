@@ -82,13 +82,15 @@ The scanner classifies every finding into one of three categories.
 | Rule–code contradiction | Doc says "use snake_case" but most code uses camelCase | Architecture judgment; high false-positive risk |
 | Coverage gaps | Major modules not mentioned anywhere in docs | "Major" is subjective |
 | Map vs manual ratio | Ratio of direct instructions to external pointers | Optimal ratio varies per project |
+| Over-constrained instructions | Absolute style rules (comment density, naming, formatting) or "always do Y before X" sequencing, in `CLAUDE.md`/`AGENTS.md` only | A judgement-oriented rewrite is authorial work, not an exact substitution; absolutes covering security, credentials, data loss, destructive operations, external contracts, protocol or schema compatibility, or licensing are never reported |
+| Self-discoverable content | Blocks that restate `package.json` scripts or the directory tree with no "why" or "which one" attached, in `CLAUDE.md`/`AGENTS.md` only | Removing a passage is authorial judgement; human-facing docs legitimately restate this |
 
 ### Authoring (created/restructured by `garden`)
 
 | Rule | Description | How it is handled |
 |---|---|---|
 | Missing doc | A recommended `AGENTS.md`/`CLAUDE.md` (build manifest + source dirs; `AGENTS.md` also when a root `CLAUDE.md` already exists) or `ARCHITECTURE.md` (~10k+ LOC) does not exist | `garden` drafts it from a code analysis and writes it after approval |
-| Thin doc | An existing doc falls clearly short of its official skeleton — including a `CLAUDE.md` that carries shared instructions without the `@AGENTS.md` import | `garden` restructures it, preserving your unique content by default |
+| Thin doc | An existing doc lacks documented coverage of major modules, or — for `ARCHITECTURE.md` — falls short of its official skeleton. Sections are optional for `CLAUDE.md`/`AGENTS.md`, so a missing section alone is not a thin doc. Also covers a `CLAUDE.md` that carries shared instructions without the `@AGENTS.md` import | `garden` restructures it, preserving your unique content by default |
 
 The default management policy is **AGENTS-first single source**: shared agent instructions live in `AGENTS.md`, while `CLAUDE.md` is kept as a thin wrapper — an `@AGENTS.md` import plus Claude Code-specific notes only. `garden` authors `AGENTS.md` first and only then converts `CLAUDE.md`, migrating shared content with per-removal approval (if you decline the `AGENTS.md` draft, `CLAUDE.md` stays a standalone full document).
 
@@ -118,6 +120,8 @@ Audit-only items are always shown at the end as informational notes, never modif
 | Freshness | Are any referenced paths newer than the doc? | All fresh = 10, some stale = 7, mostly stale = 4 |
 | Reference accuracy | Valid references / total references | 100% = 10, 90–99% = 8, 70–89% = 5, <70% = 2 |
 | Duplication | Duplicate blocks shared with other docs | 0 = 10, 1–2 = 7, ≥3 = 4 |
+
+For `CLAUDE.md` and `AGENTS.md`, `audit` additionally reports a **context-efficiency** view: the over-constraint and self-discoverable counts, plus — only when the document also triggers a size warning — how much room it has to be split into a tree of files loaded on demand. This view is displayed but never scored, so it does not move your overall score.
 
 Freshness is path-scoped — it checks only the files each doc references, so a change to an unrelated module does not penalize your docs.
 

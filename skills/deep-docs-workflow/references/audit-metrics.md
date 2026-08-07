@@ -50,9 +50,23 @@ An external-pointer line contains a Markdown link, a relative/remote pointer, or
 
 `external_pointer_lines / (external_pointer_lines + direct_instruction_lines)` is displayed but never scored because the optimum is project-specific.
 
+## 6. Context efficiency (audit-only, unscored)
+
+Applies only to `CLAUDE.md` and `AGENTS.md`. Displayed, never scored, never averaged.
+
+Report three values per document.
+
+- The `over-constraint` count.
+- The `self-discoverable` count.
+- A progressive-disclosure observation, emitted only when the same document also carries a `size-warning`. For such a document, report metric 5's external-pointer proportion as the share of disclosure already pushed out to pointers, and its remainder as the room still available to split the document into a tree of files loaded on demand, which is the remedy a long instruction document needs. Omit this observation entirely for a document under the warning boundary — asking a thirty-line `CLAUDE.md` for a higher pointer proportion is meaningless.
+
+Introduce no new threshold. The gate is the existing size-warning boundary for these two file kinds, `>100`. The `README.md` `>300` and other-docs `>200` boundaries are unrelated to this metric and stay as they are.
+
 ## Overall score
 
 Average only measurable scored metrics and round to one decimal place with `Math.round(score * 10) / 10`.
+
+Metric 6 is not a scored metric and is excluded from the average, exactly as metric 5 is. Adding either to the average would move every existing project's score.
 
 | Range | Band |
 |---|---|
