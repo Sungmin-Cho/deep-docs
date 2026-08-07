@@ -46,13 +46,13 @@ garden authoring sub-flow가 다음을 전달한다:
 ### 2. 코드베이스 분석 (Glob / Grep / Read)
 
 - **디렉터리 구조**: Glob으로 최상위 디렉터리/모듈 파악.
-- **빌드/테스트/린트 명령**: 빌드 매니페스트(`package.json` scripts, `Makefile` targets, `Cargo.toml`, `pyproject.toml`, `go.mod` 등)를 **Read로 파싱**해 명령을 추출한다 (추측 금지 — 매니페스트에 실제 있는 것만).
+- **빌드/테스트/린트 명령**: 빌드 매니페스트(`package.json` scripts, `Makefile` targets, `Cargo.toml`, `pyproject.toml`, `go.mod` 등)를 **Read로 파싱**한다. 파싱은 **모호성 판단용**이다 — 문서에 수록하는 것은 선택이 모호한 명령만이며, 왜 그것인지를 함께 쓴다(D14). 매니페스트에 하나뿐이라 모호하지 않은 명령은 수록하지 않는다: Claude가 매니페스트에서 그대로 읽는다. 추측은 여전히 금지 — 매니페스트에 실제 있는 것만 다룬다.
 - **린터 설정**: `.eslintrc*`, `ruff.toml`, `.prettierrc*` 등 Read.
 - **architecture-md**: 최상위 모듈/레이어/진입점/의존 관계를 "국가 지도" 수준으로 파악 (Codemap = 모듈 역할 1~2문장, 파일 목록 아님). 직접 파일/라인 링크는 금지(stale 위험) — 심볼명으로 검색 유도.
 
 ### 3. mode 분기
 
-- **`create`**: 공식 골격(`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함, 자명한 관행·linter 강제 스타일·파일별 설명은 제외.
+- **`create`**: 공식 골격(`<plugin-root>/skills/deep-docs-workflow/references/authoring-rules/<doc_kind>.md`)대로 신규 작성. "Claude/Codex가 코드에서 알 수 없는 것만" 포함하고, 자명한 관행·linter 강제 스타일·파일별 설명은 제외한다. D14에 따라 두 가지를 추가로 만들지 않는다: 매니페스트나 디렉터리 트리에서 그대로 읽히는 서술(tech stack 나열, 디렉터리 나열, 모호하지 않은 명령 나열)과, 스타일·장황함 영역의 절대 규칙. 후자는 판단 위임형 문장으로 쓴다.
 - **`restructure`**: 기존 문서 파싱 → 고유 콘텐츠 식별 → 골격 재배치 + 누락 섹션 보강, 고유 콘텐츠 보존.
   - **"재생성 가능"(→ `removal_candidates`)** = 코드/빌드설정/공식 규칙에서 **직접 도출 가능한** 문장만.
   - **그 외 전부 `preserved_blocks`로 기본 보존(보수적 편향)** — 애매하면 보존(default-keep).
