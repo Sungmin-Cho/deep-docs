@@ -161,6 +161,11 @@ CHANGELOG files, and keep release notes out of this file.
 
 Re-pinning the marketplace is the suite repo's job, not a hand-edit here: from
 `claude-deep-suite`, run `npm run release:bump -- deep-docs <sha40>`, which regenerates the
-docs and runs `preflight` as its own gate. It writes only the Claude marketplace manifest in
-that repo — the Codex mirror manifest there still needs a manual sync. Both live in
-`claude-deep-suite`, never here.
+docs and runs `preflight` as its own gate. It writes **both** marketplace manifests there —
+`.claude-plugin/marketplace.json` and the Codex mirror `.agents/plugins/marketplace.json` — so
+neither needs a hand sync. Both live in `claude-deep-suite`, never here.
+
+What `release:bump` cannot regenerate is a version stated outside a marker region. The two
+integrated-workflow guides carry one in their opening narrative, so `preflight` fails on them
+and they are corrected by hand — English and Korean together, since they are a translation
+pair. Treat a `preflight` failure there as the expected last step of a bump, not as a defect.
