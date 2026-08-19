@@ -2,9 +2,9 @@
 
 # deep-docs
 
-![version](https://img.shields.io/github/package-json/v/Sungmin-Cho/claude-deep-docs?label=version)
-![license](https://img.shields.io/github/license/Sungmin-Cho/claude-deep-docs)
-[![part of deep-suite](https://img.shields.io/badge/part%20of-deep--suite-5b8def)](https://github.com/Sungmin-Cho/claude-deep-suite)
+![version](https://img.shields.io/github/package-json/v/Sungmin-Cho/deep-docs?label=version)
+![license](https://img.shields.io/github/license/Sungmin-Cho/deep-docs)
+[![part of deep-suite](https://img.shields.io/badge/part%20of-deep--suite-5b8def)](https://github.com/Sungmin-Cho/deep-suite)
 
 > A document gardening agent that validates freshness and auto-repairs agent instruction files — `CLAUDE.md`, `AGENTS.md`, and project docs.
 
@@ -14,10 +14,10 @@ Agent instruction documents go stale quickly. As a codebase evolves, `CLAUDE.md`
 
 ## Role in deep-suite
 
-deep-docs is one of the plugins in the [claude-deep-suite](https://github.com/Sungmin-Cho/claude-deep-suite). In the [Harness Engineering](https://martinfowler.com/articles/harness-engineering.html) framework it operates in two quadrants:
+deep-docs is one of the plugins in the [deep-suite](https://github.com/Sungmin-Cho/deep-suite). In the [Harness Engineering](https://martinfowler.com/articles/harness-engineering.html) framework it operates in two quadrants:
 
 - **Inferential Guide** — keeps agent instruction documents accurate and current, so the guides agents read stay trustworthy.
-- **Computational Sensor** — the freshness scan (`.deep-docs/last-scan.json`) emits deterministic document-health metrics that [deep-dashboard](https://github.com/Sungmin-Cho/claude-deep-dashboard) consumes.
+- **Computational Sensor** — the freshness scan (`.deep-docs/last-scan.json`) emits deterministic document-health metrics that [deep-dashboard](https://github.com/Sungmin-Cho/deep-dashboard) consumes.
 
 ## Install
 
@@ -25,11 +25,11 @@ Via the `claude-deep-suite` marketplace:
 
 ```bash
 # Claude Code
-claude plugin marketplace add Sungmin-Cho/claude-deep-suite
+claude plugin marketplace add Sungmin-Cho/deep-suite
 claude plugin install deep-docs@claude-deep-suite
 
 # Codex
-codex plugin marketplace add Sungmin-Cho/claude-deep-suite
+codex plugin marketplace add Sungmin-Cho/deep-suite
 codex plugin add deep-docs@claude-deep-suite
 ```
 
@@ -138,13 +138,13 @@ The overall score is rounded to one decimal. If a doc has no outbound references
 
 ## Scan artifact
 
-Every scan writes `.deep-docs/last-scan.json`, wrapped in the [claude-deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/claude-deep-suite) (top-level `schema_version` + `envelope` + `payload`). `garden` and `audit` reuse it only when the envelope identity, schema version, `envelope.producer_version` (so a plugin release invalidates every cached artifact), 10-minute TTL, the `path_check_enabled` setting, `envelope.git.head`, and `payload.provenance.worktree_hash` all match; otherwise the scan re-runs. A non-Git target has no trustworthy change detector, so reuse fails closed and the envelope emits a sentinel `git` block.
+Every scan writes `.deep-docs/last-scan.json`, wrapped in the [deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/deep-suite) (top-level `schema_version` + `envelope` + `payload`). `garden` and `audit` reuse it only when the envelope identity, schema version, `envelope.producer_version` (so a plugin release invalidates every cached artifact), 10-minute TTL, the `path_check_enabled` setting, `envelope.git.head`, and `payload.provenance.worktree_hash` all match; otherwise the scan re-runs. A non-Git target has no trustworthy change detector, so reuse fails closed and the envelope emits a sentinel `git` block.
 
 ## Links
 
 - [CHANGELOG](CHANGELOG.md) ([한국어](CHANGELOG.ko.md)) — release history
-- [claude-deep-suite](https://github.com/Sungmin-Cho/claude-deep-suite) — the marketplace and the rest of the suite
-- [deep-dashboard](https://github.com/Sungmin-Cho/claude-deep-dashboard) — consumes the freshness scan metrics
+- [deep-suite](https://github.com/Sungmin-Cho/deep-suite) — the marketplace and the rest of the suite
+- [deep-dashboard](https://github.com/Sungmin-Cho/deep-dashboard) — consumes the freshness scan metrics
 
 ## License
 

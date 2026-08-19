@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Windows dev-field identity false-positive** (same root cause as [claude-deep-wiki#30](https://github.com/Sungmin-Cho/claude-deep-wiki/issues/30) Issue 1) — on native Windows + Node 22, path-based `lstat` can report `dev: 0n` while fd-based `fstat` reports the real device id for the same file, so the strict `dev` equality in `revalidateOwnedFileIdentity` rejected every owned file and broke all atomic writes (scan artifact saves, authoring commits, and the mutation lock) on that platform.
+- **Windows dev-field identity false-positive** (same root cause as [deep-wiki#30](https://github.com/Sungmin-Cho/deep-wiki/issues/30) Issue 1) — on native Windows + Node 22, path-based `lstat` can report `dev: 0n` while fd-based `fstat` reports the real device id for the same file, so the strict `dev` equality in `revalidateOwnedFileIdentity` rejected every owned file and broke all atomic writes (scan artifact saves, authoring commits, and the mutation lock) on that platform.
   - File identity is now `{dev, ino, birthtimeNs}` with an adaptive rule: `ino` always compares strictly; `dev` is the sole strict proof when both sides are nonzero (`birthtimeNs` is never consulted there — some filesystems synthesize it from `ctime`, which the temp-file write changes); when `dev` is not comparable, `birthtimeNs` must be nonzero on both sides and equal, otherwise the check fails closed — an inode alone never proves identity.
   - All three write paths (artifact atomic replace, authoring commit, lock-owner creation) re-capture the identity on the same open fd after the final write + sync, so filesystems that synthesize `birthtime` from `ctime` can no longer self-reject the just-written file or strand `.mutation.lock` in a permanently busy state.
   - Identity tests now build stat values from synthetic bigints instead of host filesystem readings, keeping the suite deterministic on volumes that report a zero device id or no birth time. Two red/green-verified regression tests cover the zero-device birthtime-shift scenario.
@@ -124,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `.deep-docs/last-scan.json` is now wrapped in the claude-deep-suite M3 cross-plugin envelope (top-level `schema_version`, `envelope`, and `payload` blocks). This is a breaking change to the artifact shape; the 10-minute TTL absorbs the migration, so no upgrade tooling is needed.
+- `.deep-docs/last-scan.json` is now wrapped in the deep-suite M3 cross-plugin envelope (top-level `schema_version`, `envelope`, and `payload` blocks). This is a breaking change to the artifact shape; the 10-minute TTL absorbs the migration, so no upgrade tooling is needed.
 - The `garden` / `audit` reuse guard is now envelope-aware: it matches `schema_version`, `envelope.schema.version`, the 10-minute window, `envelope.git.head`, and `payload.provenance.worktree_hash`.
 
 ### Added

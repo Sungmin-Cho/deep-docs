@@ -1,13 +1,13 @@
 # Contributing to deep-docs
 
 Thanks for your interest in improving **deep-docs**, the document gardening agent in the
-[claude-deep-suite](https://github.com/Sungmin-Cho/claude-deep-suite).
+[deep-suite](https://github.com/Sungmin-Cho/deep-suite).
 
 ## Development setup
 
 ```bash
-git clone https://github.com/Sungmin-Cho/claude-deep-docs.git
-cd claude-deep-docs
+git clone https://github.com/Sungmin-Cho/deep-docs.git
+cd deep-docs
 ```
 
 Node 22+ is required (ESM project). There are no runtime dependencies; runtime and
