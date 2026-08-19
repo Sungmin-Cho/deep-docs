@@ -3,7 +3,7 @@
 //
 // Inline check (no suite dependency, no ajv). Verifies that a deep-docs
 // last-scan emit conforms to the M3 envelope contract documented in
-// claude-deep-suite/docs/envelope-migration.md §1 and the deep-docs/last-scan
+// deep-suite/docs/envelope-migration.md §1 and the deep-docs/last-scan
 // payload-registry seed.
 //
 // Usage:

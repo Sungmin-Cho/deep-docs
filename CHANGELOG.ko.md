@@ -39,7 +39,7 @@
 
 ### 수정됨
 
-- **Windows dev 필드 identity false-positive** ([claude-deep-wiki#30](https://github.com/Sungmin-Cho/claude-deep-wiki/issues/30) Issue 1과 동일 근본 원인) — native Windows + Node 22에서 경로 기반 `lstat`이 같은 파일에 대해 `dev: 0n`을 보고하는 반면 fd 기반 `fstat`은 실제 device id를 보고하여, `revalidateOwnedFileIdentity`의 엄격한 `dev` 동등 비교가 소유 파일을 항상 거부해 해당 플랫폼에서 모든 atomic write(scan 아티팩트 저장, authoring commit, mutation lock)가 깨졌습니다.
+- **Windows dev 필드 identity false-positive** ([deep-wiki#30](https://github.com/Sungmin-Cho/deep-wiki/issues/30) Issue 1과 동일 근본 원인) — native Windows + Node 22에서 경로 기반 `lstat`이 같은 파일에 대해 `dev: 0n`을 보고하는 반면 fd 기반 `fstat`은 실제 device id를 보고하여, `revalidateOwnedFileIdentity`의 엄격한 `dev` 동등 비교가 소유 파일을 항상 거부해 해당 플랫폼에서 모든 atomic write(scan 아티팩트 저장, authoring commit, mutation lock)가 깨졌습니다.
   - 파일 identity를 `{dev, ino, birthtimeNs}`로 확장하고 적응형 규칙을 적용: `ino`는 항상 엄격 비교. `dev`는 양측 모두 nonzero일 때 단독 엄격 증명이며 이 경로에서 `birthtimeNs`는 참조하지 않습니다(일부 파일시스템이 `ctime`에서 합성하고, 임시 파일 write가 이를 변경하기 때문). `dev` 비교가 불가능하면 `birthtimeNs`가 양측 nonzero이면서 일치해야 하고, 아니면 fail-closed로 거부합니다 — inode 단독으로는 identity를 증명할 수 없습니다.
   - 세 write 경로(artifact atomic replace, authoring commit, lock-owner 생성) 모두 최종 write + sync 후 같은 열린 fd로 identity를 재캡처하여, `birthtime`을 `ctime`에서 합성하는 파일시스템에서 방금 쓴 파일을 스스로 거부하거나 `.mutation.lock`이 영구 busy 상태로 좌초되는 문제를 차단했습니다.
   - identity 테스트가 호스트 파일시스템 실측값 대신 합성 bigint로 stat 값을 구성해, zero device id 또는 birth time 미보고 볼륨에서도 스위트가 결정적으로 실행됩니다. zero-device birthtime-shift 시나리오를 다루는 red/green 검증 회귀 테스트 2건을 추가했습니다.
@@ -124,7 +124,7 @@
 
 ### 변경됨
 
-- `.deep-docs/last-scan.json`이 claude-deep-suite M3 cross-plugin envelope으로 wrap됩니다 (최상위 `schema_version`, `envelope`, `payload` 블록). 아티팩트 형태의 breaking change이며, 10분 TTL이 마이그레이션을 흡수하므로 별도 업그레이드 도구가 필요 없습니다.
+- `.deep-docs/last-scan.json`이 deep-suite M3 cross-plugin envelope으로 wrap됩니다 (최상위 `schema_version`, `envelope`, `payload` 블록). 아티팩트 형태의 breaking change이며, 10분 TTL이 마이그레이션을 흡수하므로 별도 업그레이드 도구가 필요 없습니다.
 - `garden` / `audit` 재사용 가드가 envelope-aware로 갱신 — `schema_version`, `envelope.schema.version`, 10분 윈도우, `envelope.git.head`, `payload.provenance.worktree_hash`를 함께 확인합니다.
 
 ### 추가됨

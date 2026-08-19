@@ -8,7 +8,7 @@ version with `node -p "JSON.parse(require('fs').readFileSync('.claude-plugin/plu
 ## Reporting a vulnerability
 
 Please report security issues **privately** via
-[GitHub Security Advisories](https://github.com/Sungmin-Cho/claude-deep-docs/security/advisories/new)
+[GitHub Security Advisories](https://github.com/Sungmin-Cho/deep-docs/security/advisories/new)
 rather than opening a public issue.
 
 We aim to acknowledge reports within a few days and will coordinate a fix and a

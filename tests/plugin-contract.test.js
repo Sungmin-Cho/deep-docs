@@ -141,9 +141,9 @@ test('bilingual install docs use supported marketplace and runtime commands', as
     ['README.md', 'README.ko.md'].map(async (path) => [path, await readFile(path, 'utf8')]),
   ));
   const installCommands = [
-    'claude plugin marketplace add Sungmin-Cho/claude-deep-suite',
+    'claude plugin marketplace add Sungmin-Cho/deep-suite',
     'claude plugin install deep-docs@claude-deep-suite',
-    'codex plugin marketplace add Sungmin-Cho/claude-deep-suite',
+    'codex plugin marketplace add Sungmin-Cho/deep-suite',
     'codex plugin add deep-docs@claude-deep-suite',
   ];
   const runtimeCommands = [

@@ -2,9 +2,9 @@
 
 # deep-docs
 
-![version](https://img.shields.io/github/package-json/v/Sungmin-Cho/claude-deep-docs?label=version)
-![license](https://img.shields.io/github/license/Sungmin-Cho/claude-deep-docs)
-[![part of deep-suite](https://img.shields.io/badge/part%20of-deep--suite-5b8def)](https://github.com/Sungmin-Cho/claude-deep-suite)
+![version](https://img.shields.io/github/package-json/v/Sungmin-Cho/deep-docs?label=version)
+![license](https://img.shields.io/github/license/Sungmin-Cho/deep-docs)
+[![part of deep-suite](https://img.shields.io/badge/part%20of-deep--suite-5b8def)](https://github.com/Sungmin-Cho/deep-suite)
 
 > 에이전트 지침 문서(`CLAUDE.md`, `AGENTS.md`, 프로젝트 문서)의 신선도를 검증하고 자동 정비하는 가드닝 에이전트.
 
@@ -14,10 +14,10 @@
 
 ## deep-suite에서의 역할
 
-deep-docs는 [claude-deep-suite](https://github.com/Sungmin-Cho/claude-deep-suite)의 플러그인 중 하나입니다. [Harness Engineering](https://martinfowler.com/articles/harness-engineering.html) 프레임워크에서 두 사분면에 걸쳐 동작합니다:
+deep-docs는 [deep-suite](https://github.com/Sungmin-Cho/deep-suite)의 플러그인 중 하나입니다. [Harness Engineering](https://martinfowler.com/articles/harness-engineering.html) 프레임워크에서 두 사분면에 걸쳐 동작합니다:
 
 - **Inferential Guide** — 에이전트 지침 문서를 정확하고 최신 상태로 유지하여, 에이전트가 읽는 가이드의 신뢰성을 보장합니다.
-- **Computational Sensor** — 신선도 스캔(`.deep-docs/last-scan.json`)이 [deep-dashboard](https://github.com/Sungmin-Cho/claude-deep-dashboard)가 소비하는 결정적 문서 건강 메트릭을 emit합니다.
+- **Computational Sensor** — 신선도 스캔(`.deep-docs/last-scan.json`)이 [deep-dashboard](https://github.com/Sungmin-Cho/deep-dashboard)가 소비하는 결정적 문서 건강 메트릭을 emit합니다.
 
 ## 설치
 
@@ -25,11 +25,11 @@ deep-docs는 [claude-deep-suite](https://github.com/Sungmin-Cho/claude-deep-suit
 
 ```bash
 # Claude Code
-claude plugin marketplace add Sungmin-Cho/claude-deep-suite
+claude plugin marketplace add Sungmin-Cho/deep-suite
 claude plugin install deep-docs@claude-deep-suite
 
 # Codex
-codex plugin marketplace add Sungmin-Cho/claude-deep-suite
+codex plugin marketplace add Sungmin-Cho/deep-suite
 codex plugin add deep-docs@claude-deep-suite
 ```
 
@@ -138,13 +138,13 @@ Audit-only 항목은 항상 마지막에 참고 사항으로 표시되며 자동
 
 ## 스캔 아티팩트
 
-모든 스캔은 [claude-deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/claude-deep-suite)으로 wrap된 `.deep-docs/last-scan.json`을 기록합니다 (최상위 `schema_version` + `envelope` + `payload`). `garden`과 `audit`은 envelope 식별 정보, schema 버전, `envelope.producer_version`(플러그인 릴리스가 캐시된 아티팩트를 전부 무효화합니다), 10분 TTL, `path_check_enabled` 설정, `envelope.git.head`, `payload.provenance.worktree_hash`가 모두 일치할 때만 이를 재사용하며, 그렇지 않으면 스캔을 다시 실행합니다. non-Git 대상에는 신뢰할 수 있는 변경 감지기가 없으므로 재사용은 fail-closed되고 envelope은 sentinel `git` 블록을 emit합니다.
+모든 스캔은 [deep-suite M3 cross-plugin envelope](https://github.com/Sungmin-Cho/deep-suite)으로 wrap된 `.deep-docs/last-scan.json`을 기록합니다 (최상위 `schema_version` + `envelope` + `payload`). `garden`과 `audit`은 envelope 식별 정보, schema 버전, `envelope.producer_version`(플러그인 릴리스가 캐시된 아티팩트를 전부 무효화합니다), 10분 TTL, `path_check_enabled` 설정, `envelope.git.head`, `payload.provenance.worktree_hash`가 모두 일치할 때만 이를 재사용하며, 그렇지 않으면 스캔을 다시 실행합니다. non-Git 대상에는 신뢰할 수 있는 변경 감지기가 없으므로 재사용은 fail-closed되고 envelope은 sentinel `git` 블록을 emit합니다.
 
 ## 링크
 
 - [CHANGELOG](CHANGELOG.md) ([한국어](CHANGELOG.ko.md)) — 릴리스 이력
-- [claude-deep-suite](https://github.com/Sungmin-Cho/claude-deep-suite) — 마켓플레이스 및 나머지 suite
-- [deep-dashboard](https://github.com/Sungmin-Cho/claude-deep-dashboard) — 신선도 스캔 메트릭을 소비
+- [deep-suite](https://github.com/Sungmin-Cho/deep-suite) — 마켓플레이스 및 나머지 suite
+- [deep-dashboard](https://github.com/Sungmin-Cho/deep-dashboard) — 신선도 스캔 메트릭을 소비
 
 ## 라이선스
 
